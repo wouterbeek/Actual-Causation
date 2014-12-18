@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Actual-causation by wouterbeek</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Actual-causation</h1>
+        <p class="header">Modeling tool for Actual Causation</p>
+
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/wouterbeek/Actual-Causation/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/wouterbeek/Actual-Causation/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/wouterbeek/Actual-Causation">View On GitHub</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/wouterbeek">wouterbeek</a></p>
+
+
+      </header>
+      <section>
+        <h1>
+<a id="-actual-causation" class="anchor" href="#-actual-causation" aria-hidden="true"><span class="octicon octicon-link"></span></a> Actual-Causation</h1>
+
+<p>Modeling tool for Actual Causation.</p>
+
+<h1>
+<a id="naive-definition-of-causation" class="anchor" href="#naive-definition-of-causation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Naive definition of causation</h1>
+
+<blockquote>
+<p><em>A</em> causes <em>B</em> if <em>B</em> counterfactually depends on <em>A</em>.</p>
+</blockquote>
+
+<p>E.g., rain causes the streets to get wet, since if it hadn't rained the street would not have been wet.
+It is easy to see that this naive definition has its flaw by considering someone emptying a bucket of water on the pavement.
+Even if it would not have rained the street would still have been wet.</p>
+
+<h1>
+<a id="improved-definition--axiomatization" class="anchor" href="#improved-definition--axiomatization" aria-hidden="true"><span class="octicon octicon-link"></span></a>Improved definition &amp; axiomatization</h1>
+
+<p>The improved definition of causality reads along the following lines:</p>
+
+<blockquote>
+<p><em>A</em> causes <em>B</em> if <em>B</em> counterfactually depends on <em>A</em> under some contingency.</p>
+</blockquote>
+
+<p>This definition can be fleshed out a bit. The following is in line with <a href="http://bjps.oxfordjournals.org/content/56/4/843.short">Halpern &amp; Pearl 2005</a>:</p>
+
+<ol>
+<li>Both the cause and what is caused must be the case.</li>
+<li>The endogenous variables can be partitioned into a causal path <em>Z</em> and the rest <em>W</em>, such that the counterfactual can be shown for some assigment of <em>W</em>. Furthermore, all the changing value of the caused in the counterfactual cannot be acchieved by <em>W</em> in the actual case.</li>
+<li>The cause is minimal.</li>
+</ol>
+
+<h1>
+<a id="a-simple-example-of-two-causes" class="anchor" href="#a-simple-example-of-two-causes" aria-hidden="true"><span class="octicon octicon-link"></span></a>A simple example of two causes</h1>
+
+<p>Let's take some examples from <a href="http://arxiv.org/abs/1106.2652">Halpern &amp; Hitchcock 2011</a>: lightning may cause a forest to burn; and so does dropping a burning match stick. We represent that either cause suffices with the following structural equation:</p>
+
+<blockquote>
+<p><em>F #= max(L,M)</em></p>
+</blockquote>
+
+<p>If both causes are needed, <em>max</em> would be replaced by <em>min</em> (i.e., conjunction as opposed to disjunction).</p>
+
+<p><img src="https://rawgit.com/wouterbeek/Actual-Causation/master/img/forest_fire.svg" alt="" title="Trumping example"></p>
+
+<h1>
+<a id="the-case-of-preemption" class="anchor" href="#the-case-of-preemption" aria-hidden="true"><span class="octicon octicon-link"></span></a>The case of preemption</h1>
+
+<p>Suppose a patient has the bad habit of smoking and is developing emphsema in response.
+This would eventually</p>
+
+<p><img src="https://rawgit.com/wouterbeek/Actual-Causation/master/img/billy_suzy_bottle.svg" alt="" title="Billy &amp; Suzy &amp; bottle"></p>
+
+<p><img src="https://cdn.rawgit.com/wouterbeek/Actual-Causation/master/img/trumping.svg" alt="" title="Trumping example"></p>
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		
+  </body>
+</html>
