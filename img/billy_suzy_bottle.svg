@@ -1,0 +1,72 @@
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" viewBox="0.00 0.00 338.27 349.74" height="350pt" width="338pt">
+  <g transform="scale(1 1) rotate(0) translate(4 345.74)" class="graph" id="graph0">
+    <title>noname</title>
+    <polygon points="-4,4 -4,-345.74 334.268,-345.74 334.268,4 -4,4" stroke="#000000" fill="white"/>
+    <g class="node" id="node1">
+      <title>0</title>
+      <ellipse ry="18" rx="94.7833" cy="-90" cx="115.344" stroke="black" fill="none"/>
+      <text font-size="14.00" font-family="Times,serif" y="-86.3" x="115.344" text-anchor="middle">Patient has emphysema</text>
+    </g>
+    <g class="node" id="node2">
+      <title>1</title>
+      <ellipse ry="18" rx="115.88" cy="-18" cx="176.344" stroke="black" fill="none"/>
+      <text font-size="14.00" font-family="Times,serif" y="-14.3" x="176.344" text-anchor="middle">Petient has chronic bronchitis</text>
+    </g>
+    <g class="edge" id="edge1">
+      <title>0-&gt;1</title>
+      <path d="M130.111,-72.055C137.493,-63.5832 146.569,-53.1679 154.719,-43.8154" stroke="black" fill="none"/>
+      <polygon points="157.359,-46.1139 161.29,-36.2753 152.082,-41.515 157.359,-46.1139" stroke="black" fill="black"/>
+    </g>
+    <g class="node" id="node3">
+      <title>2</title>
+      <ellipse ry="18" rx="64.189" cy="-170.87" cx="64.3443" stroke="black" fill="none"/>
+      <text font-size="14.00" font-family="Times,serif" y="-167.17" x="64.3443" text-anchor="middle">Patient smokes</text>
+    </g>
+    <g class="edge" id="edge2">
+      <title>2-&gt;0</title>
+      <path d="M75.4105,-152.756C82.2273,-142.214 91.096,-128.499 98.7437,-116.672" stroke="black" fill="none"/>
+      <polygon points="101.809,-118.378 104.3,-108.08 95.9305,-114.577 101.809,-118.378" stroke="black" fill="black"/>
+    </g>
+    <g class="node" id="node4">
+      <title>3</title>
+      <ellipse ry="26.7407" rx="91.8478" cy="-170.87" cx="238.344" stroke="black" fill="none"/>
+      <text font-size="14.00" font-family="Times,serif" y="-174.67" x="238.344" text-anchor="middle">Negligence damages</text>
+      <text font-size="14.00" font-family="Times,serif" y="-159.67" x="238.344" text-anchor="middle">patient's lungs</text>
+    </g>
+    <g class="edge" id="edge4">
+      <title>3-&gt;0</title>
+      <path d="M201.44,-146.206C184.961,-135.64 165.662,-123.265 149.516,-112.912" stroke="black" fill="none"/>
+      <polygon points="151.217,-109.844 140.909,-107.393 147.438,-115.737 151.217,-109.844" stroke="black" fill="black"/>
+    </g>
+    <g class="edge" id="edge3">
+      <title>3-&gt;1</title>
+      <path d="M236.755,-143.873C234.709,-123.512 230.032,-94.8992 219.344,-72 214.635,-61.9106 207.59,-52.087 200.557,-43.6936" stroke="black" fill="none"/>
+      <polygon points="203.129,-41.3181 193.895,-36.1225 197.874,-45.9422 203.129,-41.3181" stroke="black" fill="black"/>
+    </g>
+    <g class="node" id="node5">
+      <title>4</title>
+      <ellipse ry="18" rx="78.7863" cy="-251.74" cx="221.344" stroke="black" fill="none"/>
+      <text font-size="14.00" font-family="Times,serif" y="-248.04" x="221.344" text-anchor="middle">Doctor is negligent</text>
+    </g>
+    <g class="edge" id="edge5">
+      <title>4-&gt;3</title>
+      <path d="M225.033,-233.626C226.665,-226.056 228.65,-216.848 230.583,-207.879" stroke="black" fill="none"/>
+      <polygon points="234.037,-208.466 232.722,-197.953 227.194,-206.991 234.037,-208.466" stroke="black" fill="black"/>
+    </g>
+    <g class="node" id="node6">
+      <title>5</title>
+      <ellipse ry="18" rx="38.1938" cy="-323.74" cx="159.344" stroke="black" fill="none"/>
+      <text font-size="14.00" font-family="Times,serif" y="-320.04" x="159.344" text-anchor="middle">Context</text>
+    </g>
+    <g class="edge" id="edge6">
+      <title>5-&gt;2</title>
+      <path d="M148.997,-306.307C132.452,-280.032 99.9197,-228.368 80.3557,-197.298" stroke="black" fill="none"/>
+      <polygon points="83.2593,-195.34 74.9691,-188.743 77.3358,-199.07 83.2593,-195.34" stroke="black" fill="black"/>
+    </g>
+    <g class="edge" id="edge7">
+      <title>5-&gt;4</title>
+      <path d="M173.413,-306.856C181.194,-298.071 191.028,-286.969 199.76,-277.11" stroke="black" fill="none"/>
+      <polygon points="202.456,-279.344 206.467,-269.537 197.216,-274.703 202.456,-279.344" stroke="black" fill="black"/>
+    </g>
+  </g>
+</svg>

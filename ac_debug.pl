@@ -1,8 +1,9 @@
 :- module(
   ac_debug,
   [
-    debug_models/2 % +AlternativeAssignments:ordset(pair)
-                   % +Phi:compound
+    debug_models/3 % +Cause:list(pair)
+                   % +AlternativeAssignments:ordset(pair)
+                   % +CausalFormula:compound
   ]
 ).
 
@@ -25,11 +26,15 @@
 
 
 
-%! debug_models(+AlternativeAssignments:ordset(pair), +Phi:compound) is det.
+%! debug_models(
+%!   +Cause:list(pair),
+%!   +AlternativeAssignments:ordset(pair),
+%!   +CausalFormula:compound
+%! ) is det.
 
-debug_models(As, Phi):-
+debug_models(AXs, As, Phi):-
   debugging(ac), !,
-  dcg_with_output_to(atom(Atom), models(As, Phi)),
+  dcg_with_output_to(atom(Atom), models(AXs, As, Phi)),
   debug(ac, '~a', [Atom]).
 debug_models(_, _, _, _).
 
@@ -70,7 +75,9 @@ formula(Key-Value) -->
   "=",
   atom(Value).
 
-models(As, Phi) -->
+models(AXs, As, Phi) -->
+  assignments(AXs),
+  " ",
   bracketed(langular, atom('M,u')),
   models,
   assignments(As),

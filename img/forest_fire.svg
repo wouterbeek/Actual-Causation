@@ -1,0 +1,46 @@
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" viewBox="0.00 0.00 297.84 188.00" height="188pt" width="298pt">
+  <g transform="scale(1 1) rotate(0) translate(4 184)" class="graph" id="graph0">
+    <title>noname</title>
+    <polygon points="-4,4 -4,-184 293.838,-184 293.838,4 -4,4" stroke="#000000" fill="white"/>
+    <g class="node" id="node1">
+      <title>0</title>
+      <ellipse ry="18" rx="47.3916" cy="-18" cx="147.844" stroke="black" fill="none"/>
+      <text font-size="14.00" font-family="Times,serif" y="-14.3" x="147.844" text-anchor="middle">Forest fire</text>
+    </g>
+    <g class="node" id="node2">
+      <title>1</title>
+      <ellipse ry="18" rx="70.6878" cy="-90" cx="70.8437" stroke="black" fill="none"/>
+      <text font-size="14.00" font-family="Times,serif" y="-86.3" x="70.8437" text-anchor="middle">Lightning strikes</text>
+    </g>
+    <g class="edge" id="edge1">
+      <title>1-&gt;0</title>
+      <path d="M89.0916,-72.411C99.1119,-63.3017 111.691,-51.8664 122.636,-41.9163" stroke="black" fill="none"/>
+      <polygon points="125.212,-44.3047 130.257,-34.9881 120.503,-39.1251 125.212,-44.3047" stroke="black" fill="black"/>
+    </g>
+    <g class="node" id="node3">
+      <title>2</title>
+      <ellipse ry="18" rx="64.9885" cy="-90" cx="224.844" stroke="black" fill="none"/>
+      <text font-size="14.00" font-family="Times,serif" y="-86.3" x="224.844" text-anchor="middle">Match dropped</text>
+    </g>
+    <g class="edge" id="edge2">
+      <title>2-&gt;0</title>
+      <path d="M206.596,-72.411C196.576,-63.3017 183.997,-51.8664 173.052,-41.9163" stroke="black" fill="none"/>
+      <polygon points="175.184,-39.1251 165.431,-34.9881 170.476,-44.3047 175.184,-39.1251" stroke="black" fill="black"/>
+    </g>
+    <g class="node" id="node4">
+      <title>3</title>
+      <ellipse ry="18" rx="38.1938" cy="-162" cx="147.844" stroke="black" fill="none"/>
+      <text font-size="14.00" font-family="Times,serif" y="-158.3" x="147.844" text-anchor="middle">Context</text>
+    </g>
+    <g class="edge" id="edge3">
+      <title>3-&gt;1</title>
+      <path d="M130.755,-145.465C120.675,-136.301 107.725,-124.528 96.4443,-114.273" stroke="black" fill="none"/>
+      <polygon points="98.7114,-111.604 88.9576,-107.467 94.0027,-116.784 98.7114,-111.604" stroke="black" fill="black"/>
+    </g>
+    <g class="edge" id="edge4">
+      <title>3-&gt;2</title>
+      <path d="M164.933,-145.465C175.012,-136.301 187.963,-124.528 199.243,-114.273" stroke="black" fill="none"/>
+      <polygon points="201.685,-116.784 206.73,-107.467 196.976,-111.604 201.685,-116.784" stroke="black" fill="black"/>
+    </g>
+  </g>
+</svg>

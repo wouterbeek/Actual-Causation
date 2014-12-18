@@ -59,22 +59,22 @@ cause(Model, AXs, Zs):-
   AXs \== [],
   (   debugging(ac)
   ->  list_conjunction(AXs, AXs0),
-      debug_models([], AXs0)
+      debug_models(AXs, [], AXs0)
   ;   true
   ),
   % "The caused must be the case."
   % "The case" is what occurs under the empty assignment.
   sat0(AVs, Phi),
-  debug_models([], Phi),
+  debug_models(AXs, [], Phi),
 
   % Condition 2: Counterfactual under contingency.
   % It does not make sense to involve the caused part in the construction of
   % a contingent counterfactual.
   ord_subtract(Vs, PhiVars, Vs0),
-  pairs_keys(AXs, Xs),
-  \+ (member(X, Xs), Model:causal_link(_-X)),
-  % The cause must be at the onsets of the causal path.
-  has_causal_path(Model, Xs, PhiVars, Zs),
+  %%%%\+ (member(X, Xs), Model:causal_link(_-X)),
+  %%%%% The cause must be at the onsets of the causal path.
+  %%%%has_causal_path(Model, Xs, PhiVars, Zs),
+  partition(Vs0, [A,B]),
   % In the partition, the order is arbitrary.
   % Thus for each binary partition we have two causal paths to try out.
   (   A = Zs,
@@ -82,14 +82,15 @@ cause(Model, AXs, Zs):-
   ;   A = Ws,
       B = Zs
   ),
-  partition(Vs0, [A,B]),
+  pairs_keys(AXs, Xs),
+  ord_subset(Xs, Zs),
 
   assign_variables(Model, Xs, AXs_alt),
   assign_variables(Model, Ws, AWs_alt),
 
   % 2A:
   ord_union(AXs_alt, AWs_alt, Alts1),
-  sat(Model, Alts1, not(Phi)),
+  sat(AXs, Model, Alts1, not(Phi)),
 
   % 2B:
   ord_subtract(Zs, Xs, ZsMinusXs),
@@ -102,7 +103,7 @@ cause(Model, AXs, Zs):-
       subpairs(AWs_alt, Ws_sub, Alts2a),
       subpairs(AVs, ZsMinusXs_sub, Alts2b),
       ord_union(Alts2a, Alts2b, Alts2),
-      sat(Model, Alts2, Phi)
+      sat(AXs, Model, Alts2, Phi)
     )
   ),
 
@@ -173,8 +174,6 @@ ca_edge(Model, V-W):-
 
 ca_neighbor(Model, V, W):-
   ca_edge(Model, V-W).
-%ca_neighbor(Model, V, W):-
-%  ca_edge(Model, W-V).
 
 
 
@@ -232,12 +231,17 @@ formula_to_variables(Var-_, [Var]).
 
 
 
-%! sat(+Model:atom, +Alts:ordset(pair), +Phi:compound) is semidet.
+%! sat(
+%!   +Cause:list(pair),
+%!   +Model:atom,
+%!   +AlternativeAssignments:ordset(pair),
+%!   +Phi:compound
+%! ) is semidet.
 
-sat(Model, Alts, Phi):-
+sat(AXs, Model, Alts, Phi):-
   Model:determine_values(Alts, Assignment),
   sat0(Assignment, Phi),
-  debug_models(Alts, Phi).
+  debug_models(AXs, Alts, Phi).
 
 %! sat0(+Domain:list(pair), +Phi:compound) is semidet.
 % Satisfaction of a formula in a domain of pairs representing assignments.

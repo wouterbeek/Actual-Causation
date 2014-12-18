@@ -17,7 +17,7 @@ causal_formula(bs-1).
 % Causal links.
 causal_link(bt-bh).
 causal_link(bh-bs).
-causal_link(st-bh).
+causal_link(sh-bh).
 causal_link(st-sh).
 causal_link(sh-bs).
 
@@ -56,7 +56,7 @@ determine_values(As, [bh-BH,bs-BS,bt-BT,sh-SH,st-ST]):-
   ),
   (   memberchk(bh-BH, As)
   ->  true
-  ;   BH #= min(BT,1-ST)
+  ;   BH #= min(BT,1-SH)
   ),
   (   memberchk(sh-SH, As)
   ->  true
@@ -69,8 +69,8 @@ determine_values(As, [bh-BH,bs-BS,bt-BT,sh-SH,st-ST]):-
 
 
 % Endogenous varialbes: names and ranges.
-endogenous_variable(bh, 'Billy hits bottle', 0, 1).
-endogenous_variable(bs, 'Bottle shatters', 0, 1).
-endogenous_variable(bt, 'Billy throws', 0, 1).
-endogenous_variable(sh, 'Suzy hits bottle', 0, 1).
-endogenous_variable(st, 'Suzy throws', 0, 1).
+endogenous_variable(bh, 'Patient has emphysema', 0, 1). %Billy hits bottle
+endogenous_variable(bs, 'Petient has chronic bronchitis', 0, 1). %Bottle shatters
+endogenous_variable(bt, 'Patient smokes', 0, 1). %Billy throws
+endogenous_variable(sh, 'Negligence damages\npatient\'s lungs', 0, 1). %Suzy hits bottle
+endogenous_variable(st, 'Doctor is negligent', 0, 1). %Suzy throws

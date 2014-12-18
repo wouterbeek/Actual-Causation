@@ -1,0 +1,46 @@
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" viewBox="0.00 0.00 283.69 188.00" height="188pt" width="284pt">
+  <g transform="scale(1 1) rotate(0) translate(4 184)" class="graph" id="graph0">
+    <title>noname</title>
+    <polygon points="-4,4 -4,-184 279.689,-184 279.689,4 -4,4" stroke="#000000" fill="white"/>
+    <g class="node" id="node1">
+      <title>0</title>
+      <ellipse ry="18" rx="64.9885" cy="-90" cx="64.9942" stroke="black" fill="none"/>
+      <text font-size="14.00" font-family="Times,serif" y="-86.3" x="64.9942" text-anchor="middle">Doctor's advise</text>
+    </g>
+    <g class="node" id="node2">
+      <title>1</title>
+      <ellipse ry="18" rx="109.681" cy="-18" cx="137.994" stroke="black" fill="none"/>
+      <text font-size="14.00" font-family="Times,serif" y="-14.3" x="137.994" text-anchor="middle">Patient undergoes treatment</text>
+    </g>
+    <g class="edge" id="edge1">
+      <title>0-&gt;1</title>
+      <path d="M82.2942,-72.411C91.4329,-63.6479 102.816,-52.7322 112.906,-43.0569" stroke="black" fill="none"/>
+      <polygon points="115.516,-45.4037 120.311,-35.9562 110.671,-40.3512 115.516,-45.4037" stroke="black" fill="black"/>
+    </g>
+    <g class="node" id="node3">
+      <title>2</title>
+      <ellipse ry="18" rx="38.1938" cy="-162" cx="137.994" stroke="black" fill="none"/>
+      <text font-size="14.00" font-family="Times,serif" y="-158.3" x="137.994" text-anchor="middle">Context</text>
+    </g>
+    <g class="edge" id="edge2">
+      <title>2-&gt;0</title>
+      <path d="M121.793,-145.465C112.329,-136.389 100.195,-124.754 89.5739,-114.57" stroke="black" fill="none"/>
+      <polygon points="91.8074,-111.862 82.1671,-107.467 86.9626,-116.915 91.8074,-111.862" stroke="black" fill="black"/>
+    </g>
+    <g class="node" id="node4">
+      <title>3</title>
+      <ellipse ry="18" rx="63.8893" cy="-90" cx="211.994" stroke="black" fill="none"/>
+      <text font-size="14.00" font-family="Times,serif" y="-86.3" x="211.994" text-anchor="middle">Quack's advise</text>
+    </g>
+    <g class="edge" id="edge3">
+      <title>2-&gt;3</title>
+      <path d="M154.417,-145.465C164.011,-136.389 176.311,-124.754 187.078,-114.57" stroke="black" fill="none"/>
+      <polygon points="189.727,-116.882 194.586,-107.467 184.916,-111.797 189.727,-116.882" stroke="black" fill="black"/>
+    </g>
+    <g class="edge" id="edge4">
+      <title>3-&gt;1</title>
+      <path d="M194.457,-72.411C185.193,-63.6479 173.654,-52.7322 163.426,-43.0569" stroke="black" fill="none"/>
+      <polygon points="165.589,-40.2856 155.919,-35.9562 160.779,-45.3709 165.589,-40.2856" stroke="black" fill="black"/>
+    </g>
+  </g>
+</svg>
