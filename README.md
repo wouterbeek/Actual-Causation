@@ -1,8 +1,3 @@
- Actual-Causation
-================
-
-Modeling tool for Actual Causation.
-
 # Naive definition of causation
 
 > *A* causes *B* if *B* counterfactually depends on *A*.
