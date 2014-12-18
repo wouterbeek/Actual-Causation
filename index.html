@@ -48,7 +48,7 @@ It is easy to see that this naive definition has its flaw by considering someone
 Even if it would not have rained the street would still have been wet.</p>
 
 <h1>
-<a id="improved-definition--axiomatization" class="anchor" href="#improved-definition--axiomatization" aria-hidden="true"><span class="octicon octicon-link"></span></a>Improved definition &amp; axiomatization</h1>
+<a id="improved-definition--formalization" class="anchor" href="#improved-definition--formalization" aria-hidden="true"><span class="octicon octicon-link"></span></a>Improved definition &amp; formalization</h1>
 
 <p>The improved definition of causality reads along the following lines:</p>
 
@@ -60,7 +60,7 @@ Even if it would not have rained the street would still have been wet.</p>
 
 <ol>
 <li>Both the cause and what is caused must be the case.</li>
-<li>The endogenous variables can be partitioned into a causal path <em>Z</em> and the rest <em>W</em>, such that the counterfactual can be shown for some assigment of <em>W</em>. Furthermore, all the changing value of the caused in the counterfactual cannot be acchieved by <em>W</em> in the actual case.</li>
+<li>The endogenous variables can be partitioned into a causal path <em>Z</em> and the rest <em>W</em>, such that the counterfactual can be shown for some assignment of <em>W</em>. Furthermore, all the changing value of the caused in the counterfactual cannot be achieved by <em>W</em> in the actual case.</li>
 <li>The cause is minimal.</li>
 </ol>
 
@@ -80,10 +80,35 @@ Even if it would not have rained the street would still have been wet.</p>
 <h1>
 <a id="the-case-of-preemption" class="anchor" href="#the-case-of-preemption" aria-hidden="true"><span class="octicon octicon-link"></span></a>The case of preemption</h1>
 
-<p>Suppose a patient has the bad habit of smoking and is developing emphsema in response.
-This would eventually</p>
+<p>Suppose a patient has the bad habit of smoking and is developing emphysema in response.
+This would eventually lead to chronic bronchitis which can lead to serious health problems that are also costly to treat.
+While the patient in still in the early stages of emphysema, he visits the hospital for a bronchoscopy to look for the cause of his health problems.
+Alas, the patient happens to be treated by a doctor who is quite negligent. Due to the doctor's negligence the bronchoscopy leads to complicates, damaging the patient's lungs.
+Now the patient has chronic bronchitis immediately.
+The doctor does not want to get sued, since the patient would have become sick eventually anyhow.
+Intuitively one may agree that the doctor is the cause of the patient's chronic bronchitis, even though the patient would have had chronic bronchitis even if the doctor would not have been negligent.</p>
+
+<p>Cases like these are called cases of <strong>preemption</strong> and they are quite difficult to model. However, using structural equations this is not so difficult after all:</p>
+
+<blockquote>
+<p>NegligenceDamages #= Negligent</p>
+
+<p>Emphysema #= min(Smokes,1-NegligenceDamages)</p>
+
+<p>Bronchitis #= max(Emphysema,NegligenceDamages)</p>
+</blockquote>
 
 <p><img src="https://rawgit.com/wouterbeek/Actual-Causation/master/img/billy_suzy_bottle.svg" alt="" title="Billy &amp; Suzy &amp; bottle"></p>
+
+<h1>
+<a id="authority-in-medicine" class="anchor" href="#authority-in-medicine" aria-hidden="true"><span class="octicon octicon-link"></span></a>Authority in medicine</h1>
+
+<p>Suppose a doctor and a quack are both advising a patient as to whether she should undergo some form of treatment.
+Intuitively, the doctor may be considered more authoritative than the quack, and therefore more responsible in case he is advising the patient in a wrong way (let's assume that it is good for the patient to undergo this particular treatment).</p>
+
+<p>If the doctor advises to undergo the treatment the patient does so. The doctor's advise is causing her to make this decision. The same is true if the doctor advises her to abstain from treatment.</p>
+
+<p>However, if the doctor does not give a specific verdict (e.g., he does not know what to advise), the patient will listen to the advise of the quack. Even though the quack may give the same advise in these situations, the quack will only become a cause of the patient's decision when the doctor gives no advice. In the latter case, both the doctor and the quack are causing the patient to decide as she does.</p>
 
 <p><img src="https://cdn.rawgit.com/wouterbeek/Actual-Causation/master/img/trumping.svg" alt="" title="Trumping example"></p>
       </section>
