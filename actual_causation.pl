@@ -1,8 +1,9 @@
 :- module(
   actual_causation,
   [
-    cause/2, % +Model:atom
+    cause/3, % +Model:atom
              % ?Cause:list(pair(atom,nonneg))
+             % ?CausalPath:ordset
     has_cause/1 % +Model:atom
   ]
 ).
@@ -11,6 +12,7 @@
 
 @author Wouter Beek
 @see [http://arxiv.org/abs/1106.2652](Actual causation and the art of modeling)
+@tbs Causal path restricts possible partitions.
 @version 2014/12
 */
 
@@ -26,22 +28,26 @@
 
 :- use_module(plSet(set_theory)).
 
+:- use_module(plGraph(graph_walk)).
+
 :- use_module(ac(ac_debug)).
 
-% Memoization.
-:- dynamic(cause/2).
+%! cause0(?Model:atom, ?Cause:list(pair), ?CausalPath:ordset) is nondet.
+% Memoization of causes.
+
+:- dynamic(cause0/3).
 
 
 
 
 
-%! cause(+Model:atom, ?Cause:list(pair)) is nondet.
+%! cause(+Model:atom, ?Cause:list(pair), ?CausalPath:ordset) is nondet.
 
-cause(Model, AXs):-
-  retractall(cause(Model, _)),
+cause(Model, AXs, Zs):-
+  retractall(cause0(Model, _, _)),
   Model:causal_formula(Phi),
   endogenous_variables(Model, Vs),
-  
+
   % Condition 1: Facticity.
   % "The cause must be the case."
   % Especially for the generative case:
@@ -50,22 +56,25 @@ cause(Model, AXs):-
   formula_to_variables(Phi, PhiVars),
   remove_pairs(AVs, PhiVars, AVs0),
   sublist(AXs, AVs0),
+  AXs \== [],
   (   debugging(ac)
   ->  list_conjunction(AXs, AXs0),
       debug_models([], AXs0)
   ;   true
   ),
-  AXs \== [],
   % "The caused must be the case."
   % "The case" is what occurs under the empty assignment.
   sat0(AVs, Phi),
   debug_models([], Phi),
-  
+
   % Condition 2: Counterfactual under contingency.
   % It does not make sense to involve the caused part in the construction of
   % a contingent counterfactual.
   ord_subtract(Vs, PhiVars, Vs0),
-  partition(Vs0, [A,B]),
+  pairs_keys(AXs, Xs),
+  \+ (member(X, Xs), Model:causal_link(_-X)),
+  % The cause must be at the onsets of the causal path.
+  has_causal_path(Model, Xs, PhiVars, Zs),
   % In the partition, the order is arbitrary.
   % Thus for each binary partition we have two causal paths to try out.
   (   A = Zs,
@@ -73,43 +82,99 @@ cause(Model, AXs):-
   ;   A = Ws,
       B = Zs
   ),
-  pairs_keys(AXs, Xs),
-  % The cause must be part of the causal path.
-  % @tbd Not just part of it, but at the onsets of it?
-  ord_subset(Xs, Zs),
+  partition(Vs0, [A,B]),
+
   assign_variables(Model, Xs, AXs_alt),
   assign_variables(Model, Ws, AWs_alt),
-  
+
   % 2A:
   ord_union(AXs_alt, AWs_alt, Alts1),
   sat(Model, Alts1, not(Phi)),
-  
+
   % 2B:
-  %ord_minus(Zs, Xs, ZsMinusXs),
+  ord_subtract(Zs, Xs, ZsMinusXs),
   forall(
-    %(
-      sublist(Ws_sub, Ws),
-      %sublist(ZsMinusXs_sub, ZsMinusXs)
-    %),
     (
-      subpairs(AWs_alt, Ws_sub, Alts2),
+      sublist(Ws_sub, Ws),
+      sublist(ZsMinusXs_sub, ZsMinusXs)
+    ),
+    (
+      subpairs(AWs_alt, Ws_sub, Alts2a),
+      subpairs(AVs, ZsMinusXs_sub, Alts2b),
+      ord_union(Alts2a, Alts2b, Alts2),
       sat(Model, Alts2, Phi)
     )
   ),
-  
+
   % Condition 3: Minimality.
   \+ ((
-    cause(Model, AXs_smaller),
+    cause0(Model, AXs_smaller, _),
     sublist(AXs_smaller, AXs)
   )),
-  assert(cause(Model, AXs)).
+  assert(cause0(Model, AXs, Zs)).
 
 
 
 %! has_cause(+Model:atom) is semidet.
 
 has_cause(Model):-
-  once(cause(Model, _)).
+  once(cause(Model, _, _)).
+
+
+
+%! has_causal_path(
+%!   +Model:atom,
+%!   +CauseVars:ordset,
+%!   +CausedVars:ordset,
+%!   -PathVars:ordset
+%! ) is det.
+% A causal path must adhere to the following conditions:
+%   1. It must end in all and only caused variables.
+%   2. It must start in all and only cause variables.
+%   3. No superfluous or non-traversed variables are included.
+
+has_causal_path(Model, Xs, PhiVars, Zs):-
+  aggregate_all(
+    set(Path),
+    (
+      member(X, Xs),
+      member(Y, PhiVars),
+      path(
+        ca_vertex,
+        ca_edge,
+        ca_neighbor,
+        Model,
+        Y,
+        X,
+        Path
+      )
+    ),
+    Paths
+  ),
+  maplist(path_to_vertices, Paths, Vss),
+  ord_union(Vss, Zs).
+
+path_to_vertices([_,_|T], Vs):-
+  path_to_vertices0(T, Vs0),
+  list_to_ord_set(Vs0, Vs).
+
+path_to_vertices0([], []).
+path_to_vertices0([H], [H]):- !.
+path_to_vertices0([V,_|T1], [V|T2]):-
+  path_to_vertices0(T1, T2).
+
+ca_vertex(Model, V):-
+  Model:causal_link(V-_).
+ca_vertex(Model, V):-
+  Model:causal_link(_-V).
+
+ca_edge(Model, V-W):-
+  Model:causal_link(W-V).
+
+ca_neighbor(Model, V, W):-
+  ca_edge(Model, V-W).
+%ca_neighbor(Model, V, W):-
+%  ca_edge(Model, W-V).
 
 
 

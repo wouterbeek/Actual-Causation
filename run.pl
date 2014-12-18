@@ -53,3 +53,7 @@ user:current_html_style(menu_page).
 
 :- use_module(ac(models/billy_suzy_bottle)).
 :- use_module(ac(models/forest_fire)).
+
+% Top-level access.
+
+:- use_module(ac(actual_causation)).

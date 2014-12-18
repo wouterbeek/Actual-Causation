@@ -49,7 +49,10 @@ determine_values(As, [l-L,m-M,f-F]):-
   ->  true
   ;   M #= U2
   ),
-  F #= max(L,M).
+  (   memberchk(f-F, As)
+  ->  true
+  ;   F #= max(L,M)
+  ).
 
 
 % Endogenous varialbes: names and ranges.

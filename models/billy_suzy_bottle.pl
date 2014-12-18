@@ -54,9 +54,18 @@ determine_values(As, [bh-BH,bs-BS,bt-BT,sh-SH,st-ST]):-
   ->  true
   ;   ST #= U2
   ),
-  BH #= min(BT,1-ST),
-  SH #= ST,
-  BS #= max(BH,SH).
+  (   memberchk(bh-BH, As)
+  ->  true
+  ;   BH #= min(BT,1-ST)
+  ),
+  (   memberchk(sh-SH, As)
+  ->  true
+  ;   SH #= ST
+  ),
+  (   memberchk(bs-BS, As)
+  ->  true
+  ;   BS #= max(BH,SH)
+  ).
 
 
 % Endogenous varialbes: names and ranges.

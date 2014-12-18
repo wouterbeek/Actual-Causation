@@ -1,6 +1,10 @@
 % Debug file for the Actual-Causation project.
 
 
+:- use_module(library(debug)).
+:- debug(ac).
+
+
 :- [load].
 
 

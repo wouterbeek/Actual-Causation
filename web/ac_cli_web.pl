@@ -67,8 +67,8 @@ causal_graph(Model) -->
 causes(Model) -->
   {
     aggregate_all(
-      set(Cause),
-      cause(Model, Cause),
+      set(Cause-CausalPath),
+      cause(Model, Cause, CausalPath),
       Causes
     )
   },
@@ -77,8 +77,12 @@ causes(Model) -->
     \html_list(Causes, cause(Model), [ordered(true)])
   ]).
 
-cause(Model, As) -->
-  html_list(As, assignment(Model), [ordered(false)]).
+cause(Model, As-Path) -->
+  {format(atom(Atom), '~w', [Path])},
+  html([
+    p(Atom),
+    \html_list(As, assignment(Model), [ordered(false)])
+  ]).
 
 context(Model) -->
   {

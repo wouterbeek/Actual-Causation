@@ -43,21 +43,28 @@ assignments(L) -->
   bracketed(square, assignments0(L)).
 
 assignments0([]) --> "".
-assignments0([H|T]) -->
-  assignment(H),
-  assignments0(T).
+assignments0([H]) --> !,
+  assignment(H).
+assignments0([H1,H2|T]) -->
+  assignment(H1),
+  ",",
+  assignments0([H2|T]).
 
 formula(not(Phi)) --> !,
   code_radix(hex('00AC')),
   formula(Phi).
 formula(and(Phi1,Phi2)) --> !,
-  formula(Phi1),
-  code_radix(hex('2227')),
-  formula(Phi2).
+  bracketed((
+    formula(Phi1),
+    code_radix(hex('2227')),
+    formula(Phi2)
+  )).
 formula(or(Phi1,Phi2)) --> !,
-  formula(Phi1),
-  code_radix(hex('2228')),
-  formula(Phi2).
+  bracketed((
+    formula(Phi1),
+    code_radix(hex('2228')),
+    formula(Phi2)
+  )).
 formula(Key-Value) -->
   atom(Key),
   "=",
