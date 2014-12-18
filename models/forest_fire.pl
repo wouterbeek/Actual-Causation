@@ -1,13 +1,4 @@
-:- module(
-  forest_fire,
-  [
-    causal_formula/1,
-    causal_link/1,
-    context/1,
-    determine_values/2,
-    range/3
-  ]
-).
+:- module(forest_fire, []).
 
 /** <module> Actual Causation Model: Forest fire
 
@@ -19,11 +10,8 @@
 
 
 
-
-
 % Causal formula.
-causal_formula([f-1]).
-
+causal_formula(f-1).
 
 
 % Causal links.
@@ -31,10 +19,12 @@ causal_link(l-f).
 causal_link(m-f).
 
 
-
 % Context.
 context([1,1]).
 
+
+% Description.
+description(aap).
 
 
 %! determine_values(+PartialAssignment, -FullAssignment) is det.
@@ -62,8 +52,7 @@ determine_values(As, [l-L,m-M,f-F]):-
   F #= max(L,M).
 
 
-
-% Ranges.
-range(f, 0, 1).
-range(l, 0, 1).
-range(m, 0, 1).
+% Endogenous varialbes: names and ranges.
+endogenous_variable(f, 'Forest fire', 0, 1).
+endogenous_variable(l, 'Lightning strikes', 0, 1).
+endogenous_variable(m, 'Match dropped', 0, 1).

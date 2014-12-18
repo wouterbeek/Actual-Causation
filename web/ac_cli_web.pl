@@ -35,23 +35,27 @@ cli_model(Request):-
   reply_html_page(
     menu_page,
     [title('Actual-Causation CLI - Model')],
-    [\causal_graph(Model)]
+    [\description(Model),\context(Model),\causal_graph(Model)]
   ).
-
-
 
 cli_simulate(Request):-
   request_to_model(Request, Model),
   reply_html_page(
     menu_page,
     [title('Actual-Causation CLI :: Causes')],
-    [\causes(Model),\causal_graph(Model)]
+    [\description(Model),\context(Model),\causes(Model),\causal_graph(Model)]
   ).
 
 
 
+% GRAMMAR %
+
+assignment(Model, Var-Val) -->
+  {Model:endogenous_variable(Var, Name, _, _)},
+  html([Name,' = ',Val]).
+
 causal_graph(Model) -->
-  {gtrace,
+  {
     causal_graph(Model, Graph),
     export_graph_to_svg_dom(Graph, SvgDom, [method(dot)])
   },
@@ -59,8 +63,6 @@ causal_graph(Model) -->
     h1(['Causal graph for model ',i(Model)]),
     \xml_dom_as_atom(SvgDom)
   ]).
-
-
 
 causes(Model) -->
   {
@@ -72,10 +74,30 @@ causes(Model) -->
   },
   html([
     h1(['Causes of model ',i(Model)]),
-    \html_list(Causes, [ordered(true)])
+    \html_list(Causes, cause(Model), [ordered(true)])
   ]).
 
+cause(Model, As) -->
+  html_list(As, assignment(Model), [ordered(false)]).
 
+context(Model) -->
+  {
+    Model:context(Values),
+    format(atom(Values0), '~w', [Values])
+  },
+  html([
+    h1('Context'),
+    p(Values0)
+  ]).
+
+description(Model) -->
+  {Model:description(Desc)}, !,
+  html([h1('Description'),p(Desc)]).
+description(_) --> html([]).
+
+
+
+% HELPERS %
 
 request_to_model(Request, Model):-
   request_query_nvpair(Request, model, Model), !.

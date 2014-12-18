@@ -27,14 +27,16 @@ Export graphs of actual causality.
 
 
 
-causal_graph(Mod, ExportGraph):-
+causal_graph(Model, ExportGraph):-
   aggregate_all(
     set(edge(X,_,Y)),
-    Mod:causal_link(X-Y),
+    Model:causal_link(X-Y),
     EndogenousLinks
   ),
-  findall(
-    Outer,
+  % Take the *set* here, because an outer node may link to multiple
+  % (non-outer) nodes.
+  aggregate_all(
+    set(Outer),
     (
       member(edge(Outer,_,_), EndogenousLinks),
       \+ member(edge(_,_,Outer), EndogenousLinks)
@@ -44,6 +46,19 @@ causal_graph(Mod, ExportGraph):-
   maplist(exogenous_link, Outers, ExogenousLinks),
   ord_union(EndogenousLinks, ExogenousLinks, Links),
   l_edges_vertices(Links, Vs),
-  build_export_graph(Vs, Links, ExportGraph, []).
+  build_export_graph(
+    Vs,
+    Links,
+    ExportGraph,
+    [
+      graph_directed(true),
+      vertex_label(ac_vertex_label(Model))
+    ]
+  ).
 
 exogenous_link(X, edge(u,_,X)).
+
+ac_vertex_label(_, u, 'Context'):- !.
+ac_vertex_label(Model, V, VLabel):-
+  Model:endogenous_variable(V, VLabel, _, _), !.
+ac_vertex_label(_, _, undefined).

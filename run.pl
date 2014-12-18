@@ -51,4 +51,5 @@ user:current_html_style(menu_page).
 
 % Samples models.
 
+:- use_module(ac(models/billy_suzy_bottle)).
 :- use_module(ac(models/forest_fire)).
