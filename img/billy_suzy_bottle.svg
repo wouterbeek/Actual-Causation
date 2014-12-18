@@ -10,7 +10,7 @@
     <g class="node" id="node2">
       <title>1</title>
       <ellipse ry="18" rx="115.88" cy="-18" cx="176.344" stroke="black" fill="none"/>
-      <text font-size="14.00" font-family="Times,serif" y="-14.3" x="176.344" text-anchor="middle">Petient has chronic bronchitis</text>
+      <text font-size="14.00" font-family="Times,serif" y="-14.3" x="176.344" text-anchor="middle">Patient has chronic bronchitis</text>
     </g>
     <g class="edge" id="edge1">
       <title>0-&gt;1</title>
