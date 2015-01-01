@@ -4,6 +4,7 @@ TODO
 [ ] Modeling:
   [ ] Golden standard: a collection of examples.
   [ ] Expressivity: can we express common intuitions in terms of causation?
+  [ ] CLI + Web UI
   [ ] Create models
   [ ] Combine models
 [ ] Modeling environment:

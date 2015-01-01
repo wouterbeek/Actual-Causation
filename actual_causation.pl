@@ -47,7 +47,7 @@ cause(Model, AXs, Zs):-
   retractall(cause0(Model, _, _)),
   Model:causal_formula(Phi),
   endogenous_variables(Model, Vs),
-
+  
   % Condition 1: Facticity.
   % "The cause must be the case."
   % Especially for the generative case:

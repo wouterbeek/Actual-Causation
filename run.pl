@@ -47,6 +47,10 @@ user:web_module('AC GUI', ac_gui_web).
 
 user:current_html_style(menu_page).
 
+% plTabular
+:- use_module(plTabular(rdf_tabular)).
+user:web_module(plTabular, rdf_tabular).
+
 
 
 % Samples models.
