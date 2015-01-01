@@ -1,0 +1,300 @@
+% PLEASE USE THIS FILE AS A TEMPLATE
+% Check file iosart2c.tex for more examples
+%
+% Journal:
+%   Journal of Ambient Intelligence and Smart Environments (jaise)
+%   Web Intelligence and Agent Systems: An International Journal (wias)
+%   Semantic Web: Interoperability, Usability, Applicability (SW)
+% IOS Press
+% Latex 2e
+
+% options: jaise|wias|sw
+% add. options: [seceqn,secfloat,secthm,crcready,onecolumn]
+
+\documentclass{iosart2c}
+
+%\documentclass[sw]{iosart2c}
+%\documentclass[wias]{iosart2c}
+%\documentclass[jaise]{iosart2c}
+
+\usepackage[T1]{fontenc}
+\usepackage{times}%
+\usepackage{natbib}% for bibliography sorting/compressing
+%\usepackage{endnotes}
+%\usepackage{graphics}
+
+% Packages added to the template by the authors:
+\usepackage{amsfonts}
+%\usepackage{amsmath}
+\usepackage{color}
+\usepackage{ifpdf}
+\usepackage{graphicx}
+\ifpdf
+  \DeclareGraphicsExtensions{.jpg,.mps,.pdf,.png}
+\fi
+\usepackage{mathtools}
+\usepackage{xspace}
+\usepackage{verbatim}
+
+%%%%%%%%%%% Put your definitions here
+
+\newcommand{\amalgame}{Amalgame}
+\newcommand{\chip}{CHIP\xspace}
+\newcommand{\chr}{Constraint Handling Rules\xspace}
+\newcommand{\clisp}{Common Lisp\xspace}
+\newcommand{\cliopatria}{Cliopatria\xspace}
+\newcommand{\clp}{Constraint Logic Programming\xspace}
+\newcommand{\datalog}{Datalog\xspace}
+\newcommand{\dbtune}{DBtune\xspace}
+\newcommand{\europeana}{Europeana\xspace}
+\newcommand{\facet}{/facet\xspace}
+\newcommand{\fos}{Free and Open Source\xspace}
+\newcommand{\html}{HTML\xspace}
+\newcommand{\javascript}{JavaScript\xspace}
+\newcommand{\jena}{Jena\xspace}
+\newcommand{\js}{JS\xspace}
+\newcommand{\json}{JSON\xspace}
+\newcommand{\linkeddata}{Linked Data\xspace}
+\newcommand{\linkeddataset}{Linked Dataset\xspace}
+\newcommand{\linkedopendata}{Linked Open Data\xspace}
+\newcommand{\lod}{LOD\xspace}
+\newcommand{\lodlaundromat}{LOD Laundromat\xspace}
+\newcommand{\multimedian}{MultimediaN\xspace}
+\newcommand{\nquads}{N-Quads\xspace}
+\newcommand{\ntriples}{N-Triples\xspace}
+\newcommand{\pengines}{Pengines\xspace}
+\newcommand{\poseidon}{Poseidon\xspace}
+\newcommand{\prolog}{Prolog\xspace}
+\newcommand{\rdf}{RDF\xspace}
+\newcommand{\rdfa}{RDFa\xspace}
+\newcommand{\rdflib}{rdflib\xspace}
+\newcommand{\rdfs}{rdfs\xspace}
+\newcommand{\rdfxml}{RDF/XML\xspace}
+\newcommand{\rijksmuseum}{Rijksmuseum\xspace}
+\newcommand{\semanticweb}{Semantic Web\xspace}
+\newcommand{\sparql}{SPARQL\xspace}
+\newcommand{\sw}{SW\xspace}
+\newcommand{\swiprolog}{SWI-Prolog\xspace}
+\newcommand{\swish}{SWISH\xspace}
+\newcommand{\thoughtlab}{Thought Lab\xspace}
+\newcommand{\trig}{TriG\xspace}
+\newcommand{\turtle}{Turtle\xspace}
+\newcommand{\webqr}{WebQR\xspace}
+\newcommand{\wilbur}{Wilbur\xspace}
+\newcommand{\wilburlong}{Wilbur RDF Toolkit\xspace}
+\newcommand{\xml}{XML\xspace}
+\newcommand{\xmlrdf}{XMLRDF\xspace}
+\newcommand{\xsb}{XSB\xspace}
+
+\newcommand{\absolute}[1]{\lvert#1\rvert}
+\newcommand{\assignment}[2]{#1 \leftarrow #2}
+\newcommand{\bigsetdef}[2]{\big\{#1\,\,\big\vert\,\,#2\big\}}
+\newcommand{\cardinality}[1]{\lvert#1\rvert}
+\newcommand{\equivpair}[2]{#1 \approx #2}
+\newcommand{\equivset}[1]{[#1]_{\approx}}
+\newcommand{\interp}[1]{#1^{\mathcal{I}}}
+\newcommand{\intersection}[0]{\cap}
+\newcommand{\naturalnumbers}[0]{\mathbb{N}}
+\newcommand{\pair}[2]{\langle#1,#2\rangle}
+\newcommand{\powerset}[1]{\mathcal{P}(#1)}
+\newcommand{\range}[2]{#1,\ldots,#2}
+\newcommand{\sequence}[2]{\langle#1,\ldots,#2\rangle}
+\newcommand{\set}[1]{\{#1\}}
+\newcommand{\setdef}[2]{\{#1\,\vert\,#2\}}
+\newcommand{\triple}[3]{\langle#1,#2,#3\rangle}
+\newcommand{\tuple}[1]{\langle#1\rangle}
+\newcommand{\union}[0]{\cup}
+
+\newtheorem{definition}{Definition}
+\newtheorem{example}{Example}
+
+%%%%%%%%%%% End of definitions
+
+\pubyear{0000}
+\volume{0}
+\firstpage{1}
+\lastpage{1}
+
+\begin{document}
+
+\begin{frontmatter}
+
+%\pretitle{}
+\title{Escaping Compromise: Causal Theory in Ethical Deliberation}
+\runningtitle{}
+%\subtitle{}
+
+%\review{}{}{}
+
+\author[A]{\fnms{Wouter} \snm{Beek}}
+\author[A]{\fnms{Andrea} \snm{Speijer}}
+%\runningauthor{}
+\address[A]{VU University Amsterdam}
+
+\begin{abstract}
+\end{abstract}
+
+\begin{keyword}
+Responsibility, Actual causation, Ethical discussion
+\end{keyword}
+
+\end{frontmatter}
+
+%%%%%%%%%%% The article body starts:
+
+\section{Actual causation}
+
+Our interpretation of personal responsibility in terms of causation uses the axiomatization of actual causation as given in \cite{halpern2011}.
+
+Actual causation is introduced in \cite{pearl2000}, providing the following two innovations over earlier work such as \cite{lewis1973}:
+\begin{itemize}
+\item The use of structural equations as a tool for modeling causality. This is more expressive than the earlier used neuron diagrams.
+\item The placement of actual causation within a broader context of causal reasoning and causal inference [?].
+\end{itemize}
+
+\subsection{Concepts}
+
+\begin{itemize}
+\item \textbf{Conjunctive causation} The value of a variable is determined by taking the minimum of the values of other variables.
+\item \textbf{Disjunctive causation} The value of a variable is determined by taking the maximum of the values of other variables.
+\item \textbf{Endogenous variable} A variable whose value is ultimately determined by the exogenous variables.
+\item \textbf{Exogenous variable} A variable whose value is determined by factors outside the model.
+\item \textbf{Intervention} Structural equations express the effects of interventions.
+\item \textbf{Justification} Modeling choices made (see Subjectivity) should be justifiable.
+\item \textbf{Objectivity} Structural equations describe objective features of the world.
+\item \textbf{Subjectivity} The choice of variables and their values is subjective.
+\end{itemize}
+
+\subsection{Why do we need actual causation?}
+
+The naive view due to \cite{hume1739} states that causation is based on counterfactual dependence, i.e. definition \ref{def:naive_causation}.
+This is sometimes called the \emph{but-for} test.
+
+Naive causation has two problems:
+\begin{enumerate}
+\item Counterfactual should be considered under contingencies.
+      See counterexample \ref{ex:forest_fire}.
+\item \textbf{Preemption}: counterfactuals should not be considered under all contingencies.
+      See counterexample \ref{ex:suzy_billy}.
+\end{enumerate}
+
+\begin{definition}[Naive causation]
+\label{def:naive_causation}
+$A$ has naively causes $B$ if $A$ counterfactually depends on $B$ have happended and $B$ would not have happened if $A$ would not have happened.
+\end{definition}
+
+\begin{example}[Suzy \& Billy]
+\label{ex:suzy_billy}
+Suzy and Billy both pick up rocks and throw them at a bottle.
+Suzy's rock gets there first, shattering the bottle.
+Since both throws are perfectly accurate, Billy's would have shattered the bottle had Suzy not thrown.
+Thus, according to the naive counterfactual definition, Suzy's throw is not a cause of the bottle shattering.
+\end{example}
+
+\subsection{Axiomatization}
+
+According to the theory of actual causation, $A$ causes $B$ if $B$ counterfactually depends on $A$ under some contingency that is at least as normal as the actual world.
+In example \ref{ex:suzy_billy} the contingency is that Billy does not throw.
+
+\begin{example}[Late arrival]
+\label{ex:late_arrival}
+If someone typically leaves work at 5:30 PM and arrives home at 6, but, due to unusually bad traffic, arrives home at 6:10, the bad traffic is typically viewed as the cause of his being late, not the fact that he left at 5:30 (rather than 5:20).
+\end{example}
+
+\begin{definition}[Signature]
+\label{def:signature}
+A signature $\mathcal{S}$ is a tuple $\triple{\mathcal{U}}{\mathcal{V}}{\mathcal{R}}$ with $\mathcal{U}$ the set of endogenous variables, $\mathcal{V}$ the set of exogenous variables, and the function $\mathcal{R} : \mathcal{U} \union \mathcal{V} \rightarrow \powerset{\naturalnumbers}$ that assigns possible values to each variable.
+\end{definition}
+
+\begin{definition}[Causal model]
+\label{def:causal_model}
+A causal model $M$ is a pair $\pair{\mathcal{S}}{\mathcal{F}}$ with signature $\mathcal{S}$ and function $\mathcal{F}$ that maps each $X \in \mathcal{V}$ to the function $F_X : (\times_{U \in \mathcal{U}} \mathcal{R}(U)) \times (\times_{Y \in \mathcal{V} \setminus \set{X}} \mathcal{R}(Y)) \rightarrow \mathcal{R}(X)$ determining the value of $X$.
+\end{definition}
+
+Example \ref{ex:forest_fire} has the endogenous random variables $F$, $L$, and $A$, and structural equation \ref{eq:forest_fire}.
+
+\begin{example}[Forest fire]
+\label{ex:forest_fire}
+A forest fire can either be caused by lightning or an arsonist.
+\end{example}
+
+\begin{equation}
+\label{eq:forest_fire}
+F \leftarrow min(L,A)
+\end{equation}
+
+\begin{definition}[Altered assignment]
+\label{def:altered_assignment}
+\[
+  \mathcal{F}^{X \leftarrow x}(Y)
+:=
+  \left\{
+    \begin{array}{ll}
+      x              & \text{, if $Y = X$}\\
+      \mathcal{F}(Y) & \text{, otherwise}
+    \end{array}
+  \right.
+\]
+\[
+  M_{X \leftarrow x}
+:=
+  \pair{\mathcal{S}}{\mathcal{F}^{X \leftarrow x}}
+\]
+\end{definition}
+
+\begin{definition}[Directed path]
+\label{def:directed_path}
+A directed path $\sequence{X_1}{X_n}$ is a sequence of endogenous variables $X_i$ such that the value of $X_i$ depends on the values of $\sequence{X_1}{X_{i-1}}$.
+\end{definition}
+
+Models are assumed to be acyclic.
+
+\begin{definition}[Context]
+\label{def:context}
+A context $\vec{u}$ is any member of $\times_{U \in \mathcal{U}} \mathcal{R}(U)$.
+\end{definition}
+
+\begin{definition}[Primitive event]
+\label{def:primitive_event}
+A primitive event is a formula of the form $X = x$ with $X \in \mathcal{V}$ and $x \in \mathcal{R}(X)$.
+\end{definition}
+
+\begin{definition}[Causal formula]
+\label{def:causal_formula}
+A causal formula $[\assignment{\vec{Y}}{\vec{y}}]\phi$ is a formula of the form $[\range{\assignment{Y_1}{y_1}}{\assignment{Y_k}{y_k}}]\phi$ where $\phi$ is a Boolean combination of primitive events, $\range{Y_1}{Y_k}$ are distinct variables in $\mathcal{V}$, and $y_i \in \mathcal{R}{Y_i}$.
+\end{definition}
+
+A casual formula should be read as stating that $\phi$ is true if variables $Y_i$ are assigned values $y_i$.
+
+$\pair{M}{\vec{u}} \models \psi$ denotes that a casual formula $\psi$ is true in a causal model $M$ given a context $\vec{u}$.
+
+\begin{definition}[Truth]
+\begin{itemize}
+\item $\pair{M}{\vec{u}} \models V_i = v_i$, if $F_{V_i}(F_{U_1}(U_1), \ldots, F_{U_m}(U_m), F_{V_1}(V_1), \ldots, F_{V_{i-1}}(V_{i-1}), F_{V_{i+1}}(V_{i+1}), \ldots, F_{V_n}(V_n)) = v_i$, where $\mathcal{U} = \set{\range{U_1}{U_m}}$ and $\mathcal{V} = \set{\range{V_1}{V_n}}$.
+\item $\pair{M}{\vec{u}} \models \lnot \phi$, if $\pair{M}{\vec{u}} \not\models \phi$.
+\item $\pair{M}{\vec{u}} \models \phi \land \psi$, if $\pair{M}{\vec{u}} \models \phi$ and $\pair{M}{\vec{u}} \models \psi$.
+\item $\pair{M}{\vec{u}} \models [\assignment{\vec{Y}}{\vec{y}}]\phi$, if $\pair{M_{\assignment{\vec{Y}}{\vec{y}}}}{\vec{u}} \models \phi$.
+\end{itemize}
+\end{definition}
+
+Actual causes are conjunctions of primitive events.
+
+\begin{definition}[Actual cause]
+\label{def:actual_cause}
+$\vec{X} = \vec{x}$ is an actual cause of $\phi$ in $\pair{M}{\vec{u}}$ iff
+\begin{itemize}
+\item $\pair{M}{\vec{u}} \ models (\vec{X} = \vec{x})$ and $\pair{M}{\vec{u}} \models \phi$.
+\item There exists a partition of $\mathcal{V}$ into $\vec{Z}$ and $\vec{W}$ with $\vec{X} \subset \vec{Z}$ and a setting $\vec{x'}$ and $\vec{w}$ of the variables in $\vec{X}$ and $\vec{W}$, such that: if $\pair{M}{\vec{u}} \models Z = z^*$ for all $Z \in Z^*$, then:
+  \begin{itemize}
+  \item $\pair{M}{\vec{u}} \models [\assignment{\vec{X}}{\vec{x'}}, \assignment{\vec{W}}{\vec{w}}] \lnot \phi$.
+  \item $\pair{M}{\vec{u}} \models [\assignment{\vec{X}}{\vec{x}}, \assignment{\vec{W'}}{\vec{w}}, \assignment{\vec{Z'}}{\vec{z^*}}] \phi$ for all subsets $\vec{W'}$ of $\vec{W}$ and all subsets $\vec{Z'}$ of $\vec{Z}$, where $\assignment{\vec{W}}{\vec{w}}$ denotes the assignment where the variables in $\vec{W'}$ get the same values are they would in the assignment $\assignment{\vec{W}}{\vec{w}}$.
+  \end{itemize}
+\item No subset of $\vec{X}$ satisfies the foregoing.
+\end{itemize}
+\end{definition}
+
+%%%%%%%%%%% The bibliography starts:
+\bibliographystyle{plain}
+\bibliography{notebook}
+
+\end{document}

@@ -1,4 +1,10 @@
 *~
+*.aux
+*.bbl
+*.blg
 *.db
 *.log
+*.out
+*.pdf
 data/*
+
