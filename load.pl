@@ -28,3 +28,7 @@ user:project('Actual-Causation', 'Modeling tool for Actual Causation.', ac).
      plXml,
      plXsd
    ]).
+
+:- use_module(library(semweb/rdf_db)).
+:- rdf_register_prefix(ac, 'http://ac.org/resource/').
+:- rdf_register_prefix(aco, 'http://ac.org/ontology/').

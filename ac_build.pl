@@ -1,10 +1,11 @@
 :- module(
   ac_build_model,
   [
-    assert_model/4 % +Name:atom
-                   % +Description:atom
-                   % +StructuralEquations:list(compound)
-                   % +CausalFormula:pair(atom,integer)
+    assert_model/4, % +Name:atom
+                    % +Description:atom
+                    % +StructuralEquations:list(compound)
+                    % +CausalFormula:pair(atom,integer)
+    assign_value/1 % +Assignment:pair(iri,integer)
   ]
 ).
 
@@ -24,9 +25,6 @@
 :- use_module(plRdf(api/rdfs_read)).
 :- use_module(plRdf(reification/rdf_reification_write)).
 
-:- rdf_register_prefix(ac, 'http://ac.org/resource/').
-:- rdf_register_prefix(aco, 'http://ac.org/ontology/').
-
 
 
 
@@ -38,11 +36,10 @@ assert_causal_formula(Name-Val):-
   rdf_assert_typed_literal(Var, ac:causal_formula, Val, xsd:integer, ac).
 
 
-
 %! assert_causal_link(+Left:iri, +Right:iri) is det.
 
 assert_causal_link(Left, Right):-
-  rdf_assert(Left, ac:causes, Right, ac).
+  rdf_assert(Right, ac:causes, Left, ac).
 
 
 
@@ -84,7 +81,8 @@ assert_model(Name, Description, StructuralEquations, CausalFormula):-
   maplist(assert_structural_equation(Model), StructuralEquations),
 
   % ac:causal_formula
-  assert_causal_formula(CausalFormula).
+  % Interpreted as a conjunction.
+  maplist(assert_causal_formula(CausalFormula)).
 
 
 
@@ -111,6 +109,14 @@ assert_structural_equation(Model, Eq):-
   % ac:structural_equation
   with_output_to(atom(Eq0), write_canonical(Eq)),
   rdf_assert_simple_literal(LeftVar, ac:structural_equation, Eq0, ac).
+
+
+
+%! assign_value(+Assignment:pair(iri,integer)) is det.
+
+assign_value(Var-Val):-
+  rdf_retractall(Var, ac:value, _, ac),
+  rdf_assert_typed_literal(Var, ac:value, Val, xsd:integer, ac).
 
 
 

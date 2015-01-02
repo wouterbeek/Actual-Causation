@@ -30,12 +30,9 @@
 
 :- use_module(plGraph(graph_walk)).
 
+:- use_module(ac(ac_calculate_values)).
 :- use_module(ac(ac_debug)).
-
-%! cause0(?Model:atom, ?Cause:list(pair), ?CausalPath:ordset) is nondet.
-% Memoization of causes.
-
-:- dynamic(cause0/3).
+:- use_module(ac(ac_read)).
 
 
 
@@ -44,16 +41,16 @@
 %! cause(+Model:atom, ?Cause:list(pair), ?CausalPath:ordset) is nondet.
 
 cause(Model, AXs, Zs):-
-  retractall(cause0(Model, _, _)),
-  Model:causal_formula(Phi),
+  causal_formula(Model, Phi0),
+  list_conjunction(Phi0, Phi),
   endogenous_variables(Model, Vs),
   
   % Condition 1: Facticity.
   % "The cause must be the case."
   % Especially for the generative case:
   % It does not make sense for cause and caused to be the same.
-  Model:determine_values([], AVs),
-  formula_to_variables(Phi, PhiVars),
+  calculate_values(Model, Context, [], AVs),
+  pairs_keys(Phi0, PhiVars),
   remove_pairs(AVs, PhiVars, AVs0),
   sublist(AXs, AVs0),
   AXs \== [],
@@ -232,27 +229,23 @@ formula_to_variables(Var-_, [Var]).
 
 
 %! sat(
-%!   +Cause:list(pair),
-%!   +Model:atom,
-%!   +AlternativeAssignments:ordset(pair),
+%!   +Model:iri,
+%!   +Context:ordset(pair(iri,integer)),
+%!   +Assignment:ordset(pair(iri,integer)),
 %!   +Phi:compound
 %! ) is semidet.
 
-sat(AXs, Model, Alts, Phi):-
-  Model:determine_values(Alts, Assignment),
-  sat0(Assignment, Phi),
-  debug_models(AXs, Alts, Phi).
+sat(Model, Context, A, Phi):-
+  calculate_values(Model, Context, A, _),
+  sat0(Phi).
 
 %! sat0(+Domain:list(pair), +Phi:compound) is semidet.
 % Satisfaction of a formula in a domain of pairs representing assignments.
 
-sat0(Dom, not(Phi)):- !,
-  \+ sat0(Dom, Phi).
-sat0(Dom, and(Phi,Psi)):- !,
-  sat0(Dom, Phi),
-  sat0(Dom, Psi).
-sat0(Dom, or(Phi,Psi)):- !,
-  sat0(Dom, Phi);
-  sat0(Dom, Psi).
-sat0(Dom, Phi):-
+sat0(not(Phi)):- !,
+  \+ sat0(Phi).
+sat0(and(Phi,Psi)):- !,
+  sat0(Phi),
+  sat0(Psi).
+sat0(Var-Val):-
   memberchk(Phi, Dom).

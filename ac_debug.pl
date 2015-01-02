@@ -10,7 +10,7 @@
 /** <module> Actual Causation: Debug tools
 
 @author Wouter Beek
-@version 2014/12
+@version 2014/12-2015/01
 */
 
 :- use_module(library(debug)).
@@ -22,13 +22,15 @@
 :- use_module(plDcg(dcg_generics)).
 :- use_module(plDcg(dcg_unicode)).
 
+:- use_module(plRdf(api/rdfs_read)).
+
 
 
 
 
 %! debug_models(
-%!   +Cause:list(pair),
-%!   +AlternativeAssignments:ordset(pair),
+%!   +Cause:list(pair(iri,integer)),
+%!   +AlternativeAssignments:ordset(pair(iri,integer)),
 %!   +CausalFormula:compound
 %! ) is det.
 
@@ -39,9 +41,11 @@ debug_models(AXs, As, Phi):-
 debug_models(_, _, _, _).
 
 assignment(Key-Value) -->
-  atom(Key),
+  {rdfs_label_value(Key, KeyLabel)},
+  atom(KeyLabel),
   code_radix(hex('2190')),
-  atom(Value).
+  {rdfs_label_value(Value, ValueLabel)},
+  atom(ValueLabel).
 
 assignments([]) --> "".
 assignments(L) -->
@@ -71,9 +75,11 @@ formula(or(Phi1,Phi2)) --> !,
     formula(Phi2)
   )).
 formula(Key-Value) -->
-  atom(Key),
+  {rdfs_label_value(Key, KeyLabel)},
+  atom(KeyLabel),
   "=",
-  atom(Value).
+  {rdfs_label_value(Value, ValueLabel)},
+  atom(ValueLabel).
 
 models(AXs, As, Phi) -->
   assignments(AXs),
