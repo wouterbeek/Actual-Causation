@@ -1,6 +1,11 @@
 TODO
 ====
 
+[ ] Implementation:
+  [ ] Add RDFS schema for AC models.
+  [o] Rewrite of AC simulator using RDF models.
+  [ ] Store structural equations using IRIs.
+  [ ] Causal formulas using IRIs.
 [ ] Modeling:
   [ ] Golden standard: a collection of examples.
   [ ] Expressivity: can we express common intuitions in terms of causation?

@@ -6,8 +6,15 @@
     determine_value/3, % +Model:iri
                        % +Variable:iri
                        % -Value:integer
-    determined_variable/2 % +Model:iri
-                          % -Variable:iri
+    determined_variable/2, % +Model:iri
+                           % -Variable:iri
+    endogenous_variables/2, % +Model:iri
+                            % -Endogenous:ordset(iri)
+    outer_variable/2, % +Model:iri
+                      % -Variable:iri
+    variable/3 % +Model:iri
+               % +Name:atom
+               % -Variable:iri
   ]
 ).
 
@@ -19,7 +26,7 @@
 
 :- use_module(library(aggregate)).
 :- use_module(library(apply)).
-:- use_module(library(semweb/rdf_db)).
+:- use_module(library(semweb/rdf_db), except([rdf_node/1])).
 :- use_module(library(semweb/rdfs)).
 
 :- use_module(plRdf(api/rdf_read)).
@@ -46,22 +53,23 @@ causal_formula(Model, Pairs):-
 %! determine_value(+Model:iri, +Variable:iri, -Value:integer) is det.
 % Succeeds for the determined value of the given variable.
 
-determine_value(Model, Var, Val):-
+determine_value(M, Var, Val):-
   rdf_simple_literal(Var, ac:structural_equation, Eq0),
-  read_term_from_atom(Eq0, Eq),
+  read_term_from_atom(Eq0, Eq, []),
   Eq = #=(_,Right0),
-  instantiate_term(Right0, Right),
+  instantiate_term(M, Right0, Right),
   Val is Right.
 
 
 
+%! determined_variable(+Model:iri, +Variable:iri) is semidet.
 %! determined_variable(+Model:iri, -Variable:iri) is nondet.
 % Succeeds for endogenous variables that have not yet been calculated
 % but whose value is completely determined by values of variables
 % that have been calculated.
 
-determined_variable(Model, Var):-
-  rdfs_individual(Var, ac:'EndogenousVariable'),
+determined_variable(M, Var):-
+  rdf_has(M, ac:endogenous_variable, Var),
   \+ rdf_has(Var, ac:value, _),
   forall(
     rdf_has(Var0, ac:causes, Var),
@@ -70,13 +78,46 @@ determined_variable(Model, Var):-
 
 
 
-%! instantiate_term(+Term, -InstantiatedTerm) is det.
+%! endogenous_variables(+Model:iri, -Endogenous:ordset(iri)) is det.
+% Extracts the endogenous variables from the model.
 
-instantiate_term(Name, Val):-
+endogenous_variables(M, Vs):-
+  aggregate_all(
+    set(V),
+    rdf_has(M, ac:endogenous_variable, V),
+    Vs
+  ).
+
+
+
+%! outer_variable(+Model:iri, +Variable:iri) is semidet.
+%! outer_variable(+Model:iri, -Variable:iri) is nondet.
+
+outer_variable(M, Var):-
+  rdf_has(M, ac:endogenous_variable, Var),
+  \+ rdf_has(_, ac:causes, Var).
+
+
+
+%! variable(+Model:iri, +Name:atom, -Variable:iri) is semidet.
+
+variable(M, Name, Var):-
+  rdf_has(M, ac:endogenous_variable, Var),
+  rdfs_label_value(Var, Name).
+
+
+
+
+
+% HELPERS %
+
+%! instantiate_term(+Module:iri, +Term, -InstantiatedTerm) is det.
+
+instantiate_term(M, Name, Val):-
   atom(Name), !,
-  once(rdfs_label_value(Var, Name)),
+  variable(M, Name, Var),
   rdf_typed_literal(Var, ac:value, Val, xsd:integer, _).
-instantiate_term(Expr1, Expr2):-
+instantiate_term(M, Expr1, Expr2):-
   Expr1 =.. [Pred|Args1],
-  maplist(instantiate_term, Args1, Args2),
+  maplist(instantiate_term(M), Args1, Args2),
   Expr2 =.. [Pred|Args2].

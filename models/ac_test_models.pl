@@ -1,7 +1,8 @@
 :- module(
   ac_test_models,
   [
-    test_model/1 % +Name:atom
+    test_model/2 % +Name:atom
+                 % -Model:iri
   ]
 ).
 
@@ -13,16 +14,17 @@
 
 :- use_module(library(clpfd)).
 
-:- use_module(ac(ac_build_model)).
+:- use_module(ac(ac_build)).
 
 
 
 
 
-test_model(forest_fire):-
+test_model(forest_fire, M):-
   assert_model(
     forest_fire,
     aap,
+    [fire-[0,1],lightning-[0,1],match-[0,1]],
     [fire #= max(lightning,match)],
-    fire-1
+    M
   ).

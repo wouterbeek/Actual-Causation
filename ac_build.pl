@@ -1,10 +1,11 @@
 :- module(
   ac_build_model,
   [
-    assert_model/4, % +Name:atom
+    assert_model/5, % +Name:atom
                     % +Description:atom
+                    % +Signature:list(pair(atom,list(integer))),
                     % +StructuralEquations:list(compound)
-                    % +CausalFormula:pair(atom,integer)
+                    % -Model:iri
     assign_value/1 % +Assignment:pair(iri,integer)
   ]
 ).
@@ -12,40 +13,65 @@
 /** <module> AC: Build model
 
 @author Wouter Beek
+@tbd Causal formulas should include conjunction, negation, primitive event.
 @version 2014/12-2015/01
 */
 
 :- use_module(library(aggregate)).
 :- use_module(library(apply)).
 :- use_module(library(clpfd)).
-:- use_module(library(semweb/rdf_db)).
+:- use_module(library(semweb/rdf_db), except([rdf_node/1])).
+
+:- use_module(generics(lambda_meta)).
 
 :- use_module(plRdf(api/rdf_build)).
 :- use_module(plRdf(api/rdfs_build)).
 :- use_module(plRdf(api/rdfs_read)).
 :- use_module(plRdf(reification/rdf_reification_write)).
 
+:- use_module(ac(ac_read)).
 
 
 
 
-%! assert_causal_formula(+CausalFormula:pair(atom,integer)) is det.
 
-assert_causal_formula(Name-Val):-
-  once(rdfs_label_value(Var, Name, _, ac)),
-  rdf_assert_typed_literal(Var, ac:causal_formula, Val, xsd:integer, ac).
+%! assert_model(
+%!   +Name:atom,
+%!   +Description:atom,
+%!   +Signature:list(pair(atom,list(integer))),
+%!   +StructuralEquations:list(compound),
+%!   -Model:iri
+%! ) is det.
+
+assert_model(Name, Description, Signature, StructuralEquations, M):-
+  % ac:Model
+  rdf_create_next_resource(ac, [model], aco:'Model', ac, M),
+
+  % rdfs:label
+  rdfs_assert_label(M, Name, ac),
+
+  % dcterms:description
+  rdf_assert_plain_literal(M, dcterms:description, Description, ac),
+  
+  % ac:EndogenousVariable
+  % ac:endogenous_variable
+  % ac:possible_value
+  maplist(assert_signature(M), Signature),
+  
+  % ac:structural_equation
+  % ac:causes
+  maplist(assert_structural_equation(M), StructuralEquations).
 
 
-%! assert_causal_link(+Left:iri, +Right:iri) is det.
 
-assert_causal_link(Left, Right):-
-  rdf_assert(Right, ac:causes, Left, ac).
+%! assert_signature(
+%!   +Model:iri,
+%!   +SignatureEntry:pair(atom,list(integer))
+%! ) is det.
 
-
-
-%! assert_endogenous_variable(+Model:iri, +Name:atom, -Var:iri) is det.
-
-assert_endogenous_variable(Model, Name, Var):-
+assert_signature(M, Name-Vals):-
+  % ac:EndogenousVariable
+  % rdf:type
   rdf_create_next_resource(
     ac,
     [variable,endogenous],
@@ -53,36 +79,24 @@ assert_endogenous_variable(Model, Name, Var):-
     ac,
     Var
   ),
-  rdfs_assert_label(Var, Name, ac),
-  rdf_assert(Model, ac:endogenous_variable, Var, ac).
-
-
-
-%! assert_model(
-%!   +Name:atom,
-%!   +Description:atom,
-%!   +StructuralEquations:list(compound),
-%!   +CausalFormula:pair(atom,integer)
-%! ) is det.
-
-assert_model(Name, Description, StructuralEquations, CausalFormula):-
-  % ac:Model
-  rdf_create_next_resource(ac, [model], aco:'Model', ac, Model),
-
-  % rdfs:label
-  rdfs_assert_label(Model, Name, ac),
-
-  % dcterms:description
-  rdf_assert_plain_literal(Model, dcterms:description, Description, ac),
-
+  
   % ac:endogenous_variable
-  % ac:EndogenousVariable
-  % ac:structural_equation
-  maplist(assert_structural_equation(Model), StructuralEquations),
-
-  % ac:causal_formula
-  % Interpreted as a conjunction.
-  maplist(assert_causal_formula(CausalFormula)).
+  rdf_assert(M, ac:endogenous_variable, Var, ac),
+  
+  % rdfs:label
+  rdfs_assert_label(Var, Name, ac),
+  
+  % ac:possible_value
+  maplist(
+    \Val^rdf_assert_typed_literal(
+      Var,
+      ac:possible_value,
+      Val,
+      xsd:integer,
+      ac
+    ),
+    Vals
+  ).
 
 
 
@@ -91,20 +105,13 @@ assert_model(Name, Description, StructuralEquations, CausalFormula):-
 %!   +StructuralEquation:compound
 %! ) is det.
 
-assert_structural_equation(Model, Eq):-
+assert_structural_equation(M, Eq):-
   Eq = #=(Left,Right),
   term_to_atom_subterms(Right, Rights),
-
-  % ac:endogenous_variable
-  % ac:EndogenousVariable
-  maplist(
-    assert_endogenous_variable(Model),
-    [Left|Rights],
-    [LeftVar|RightVars]
-  ),
-
-  % ac:causal_link
-  maplist(assert_causal_link(LeftVar), RightVars),
+  maplist(variable(M), [Left|Rights], [LeftVar|RightVars]),
+  
+  % ac:causes
+  maplist(\RightVar^rdf_assert(RightVar, ac:causes, LeftVar, ac), RightVars),
 
   % ac:structural_equation
   with_output_to(atom(Eq0), write_canonical(Eq)),
@@ -115,7 +122,6 @@ assert_structural_equation(Model, Eq):-
 %! assign_value(+Assignment:pair(iri,integer)) is det.
 
 assign_value(Var-Val):-
-  rdf_retractall(Var, ac:value, _, ac),
   rdf_assert_typed_literal(Var, ac:value, Val, xsd:integer, ac).
 
 

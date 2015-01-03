@@ -1,9 +1,10 @@
 :- module(
   ac_debug,
   [
-    debug_models/3 % +Cause:list(pair)
-                   % +AlternativeAssignments:ordset(pair)
-                   % +CausalFormula:compound
+    debug_models/4 % +Model:iri
+                   % +Context:list(pair(iri,integer))
+                   % +Assignment:ordset(pair(iri,integer))
+                   % +Formula:compound
   ]
 ).
 
@@ -28,36 +29,49 @@
 
 
 
+%! assignment(+Assignment:list(pair(iri,integer)))// is det.
+
+assignment([]) --> "".
+assignment(As) -->
+  bracketed(square, assignment0(As)).
+
+assignment0([]) --> "".
+assignment0([A1]) --> !,
+  assignment_entry(A1).
+assignment0([A1,A2|As]) -->
+  assignment_entry(A1),
+  ",",
+  assignment0([A2|As]).
+
+
+
+%! assignment_entry(+AssignmentEntry:pair(iri,integer))// is det.
+
+assignment_entry(Var-Val) -->
+  {rdfs_label_value(Var, VarLabel)},
+  atom(VarLabel),
+  code_radix(hex('2190')),
+  {rdfs_label_value(Val, ValLabel)},
+  atom(ValLabel).
+
+
+
 %! debug_models(
-%!   +Cause:list(pair(iri,integer)),
-%!   +AlternativeAssignments:ordset(pair(iri,integer)),
-%!   +CausalFormula:compound
+%!   +Model:iri,
+%!   +Context:list(pair(iri,integer)),
+%!   +Assignment:ordset(pair(iri,integer)),
+%!   +Formula:compound
 %! ) is det.
 
-debug_models(AXs, As, Phi):-
+debug_models(M, Us, As, Phi):-
   debugging(ac), !,
-  dcg_with_output_to(atom(Atom), models(AXs, As, Phi)),
+  dcg_with_output_to(atom(Atom), models(M, Us, As, Phi)),
   debug(ac, '~a', [Atom]).
 debug_models(_, _, _, _).
 
-assignment(Key-Value) -->
-  {rdfs_label_value(Key, KeyLabel)},
-  atom(KeyLabel),
-  code_radix(hex('2190')),
-  {rdfs_label_value(Value, ValueLabel)},
-  atom(ValueLabel).
 
-assignments([]) --> "".
-assignments(L) -->
-  bracketed(square, assignments0(L)).
 
-assignments0([]) --> "".
-assignments0([H]) --> !,
-  assignment(H).
-assignments0([H1,H2|T]) -->
-  assignment(H1),
-  ",",
-  assignments0([H2|T]).
+%! formula(+Formula:compound)// is det.
 
 formula(not(Phi)) --> !,
   code_radix(hex('00AC')),
@@ -74,17 +88,30 @@ formula(or(Phi1,Phi2)) --> !,
     code_radix(hex('2228')),
     formula(Phi2)
   )).
-formula(Key-Value) -->
-  {rdfs_label_value(Key, KeyLabel)},
-  atom(KeyLabel),
+formula(Var-Val) -->
+  {rdfs_label_value(Var, VarLabel)},
+  atom(VarLabel),
   "=",
-  {rdfs_label_value(Value, ValueLabel)},
-  atom(ValueLabel).
+  {rdfs_label_value(Val, ValLabel)},
+  atom(ValLabel).
 
-models(AXs, As, Phi) -->
-  assignments(AXs),
-  " ",
-  bracketed(langular, atom('M,u')),
+
+
+%! models(
+%!   +Model:iri,
+%!   +Context:list(pair(iri,integer)),
+%!   +Assignment:ordset(pair(iri,integer)),
+%!   +Formula:compound
+%! )// is det.
+
+models(M, Us, As, Phi) -->
+  bracketed(langular, model_context0(M, Us)),
   models,
-  assignments(As),
+  assignment(As),
   formula(Phi).
+
+model_context0(M, Us) -->
+  {once(rdfs_label_value(M, MLabel))},
+  atom(MLabel),
+  ",",
+  assignment(Us).

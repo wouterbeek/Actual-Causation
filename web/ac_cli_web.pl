@@ -3,7 +3,7 @@
 /** <module> Web-based UI to the CLI of Actual-Causation
 
 @author Wouter Beek
-@version 2014/12
+@version 2014/12-2015/01
 */
 
 :- use_module(library(aggregate)).
@@ -20,8 +20,12 @@
 
 :- use_module(plGraphDraw(svg_gv)).
 
+:- use_module(plRdf(api/rdf_read)).
+:- use_module(plRdf(api/rdfs_read)).
+
 :- use_module(ac(actual_causal_graph)).
 :- use_module(ac(actual_causation)).
+:- use_module(ac(models/ac_test_models)).
 
 :- http_handler(ac(cli/model), cli_model, [prefix]).
 :- http_handler(ac(cli/simulate), cli_simulate, [prefix]).
@@ -31,20 +35,23 @@
 
 
 cli_model(Request):-
-  request_to_model(Request, Model),
+  request_to_model(Request, M),
+  once(rdfs_label_value(M, MLabel)),
   reply_html_page(
     menu_page,
-    [title('Actual-Causation CLI - Model')],
-    [\description(Model),\context(Model),\causal_graph(Model)]
+    [title(['Actual-Causation CLI - Model - ',MLabel])],
+    [\description(M),\causal_graph(M)]
   ).
 
 cli_simulate(Request):-
-  request_to_model(Request, Model),
+  request_to_model(Request, M),
   reply_html_page(
     menu_page,
     [title('Actual-Causation CLI :: Causes')],
-    [\description(Model),\context(Model),\causes(Model),\causal_graph(Model)]
+    [\description(M),\causal_graph(M)]
   ).
+
+
 
 
 
@@ -54,26 +61,26 @@ assignment(Model, Var-Val) -->
   {Model:endogenous_variable(Var, Name, _, _)},
   html([Name,' = ',Val]).
 
-causal_graph(Model) -->
+causal_graph(M) -->
   {
-    causal_graph(Model, Graph),
-    export_graph_to_svg_dom(Graph, SvgDom, [method(dot)])
+    causal_graph(M, ExportG),
+    export_graph_to_svg_dom(ExportG, Svg, [method(dot)])
   },
   html([
-    h1(['Causal graph for model ',i(Model)]),
-    \xml_dom_as_atom(SvgDom)
+    h1('Causal graph'),
+    \xml_dom_as_atom(Svg)
   ]).
 
-causes(Model) -->
+causes(M) -->
   {
     aggregate_all(
-      set(Cause-CausalPath),
-      cause(Model, Cause, CausalPath),
-      Causes
+      set(Us-Xs),
+      models(M, Us, Phi, Xs),
+      Pairs
     )
   },
   html([
-    h1(['Causes of model ',i(Model)]),
+    h1('Causes'),
     \html_list(Causes, cause(Model), [ordered(true)])
   ]).
 
@@ -94,15 +101,18 @@ context(Model) -->
     p(Values0)
   ]).
 
-description(Model) -->
-  {Model:description(Desc)}, !,
-  html([h1('Description'),p(Desc)]).
+description(M) -->
+  {rdf_plain_literal(M, dcterms:description, Description, _)}, !,
+  html([h1('Description'),p(Description)]).
 description(_) --> html([]).
+
+
 
 
 
 % HELPERS %
 
-request_to_model(Request, Model):-
-  request_query_nvpair(Request, model, Model), !.
-request_to_model(_, forest_fire).
+request_to_model(Request, M):-
+  request_query_nvpair(Request, model, M), !.
+request_to_model(_, M):-
+  test_model(forest_fire, M).

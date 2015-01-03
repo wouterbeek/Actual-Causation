@@ -1,7 +1,7 @@
 :- module(
   actual_causal_graph,
   [
-    causal_graph/2 % +Model:atom
+    causal_graph/2 % +Model:iri
                    % -ExportGraph:compound
   ]
 ).
@@ -11,54 +11,69 @@
 Export graphs of actual causality.
 
 @author Wouter Beek
-@version 2014/12
+@version 2014/12-2015/01
 */
 
 :- use_module(library(aggregate)).
 :- use_module(library(apply)).
 :- use_module(library(lists), except([delete/3,subset/2])).
 :- use_module(library(ordsets)).
+:- use_module(library(semweb/rdf_db), except([rdf_node/1])).
 
 :- use_module(plGraph(l_graph/l_graph)).
 
 :- use_module(plGraphDraw(build_export_graph)).
 
+:- use_module(plRdf(api/rdfs_read)).
+
+:- rdf_meta(ac_vertex_label(r,-)).
+:- rdf_meta(exogenous_edge(+,t)).
 
 
 
 
-causal_graph(Model, ExportGraph):-
+
+causal_graph(M, ExportG):-
+  % 1: Endogenous edges.
   aggregate_all(
     set(edge(X,_,Y)),
-    Model:causal_link(X-Y),
-    EndogenousLinks
+    (
+      rdf_has(X, ac:causes, Y),
+      rdf_has(M, ac:endogenous_variable, X)
+    ),
+    EndogenousEs
   ),
+  
+  % 2: Exogenous edges.
   % Take the *set* here, because an outer node may link to multiple
   % (non-outer) nodes.
   aggregate_all(
     set(Outer),
     (
-      member(edge(Outer,_,_), EndogenousLinks),
-      \+ member(edge(_,_,Outer), EndogenousLinks)
+      member(edge(Outer,_,_), EndogenousEs),
+      \+ member(edge(_,_,Outer), EndogenousEs)
     ),
     Outers
   ),
-  maplist(exogenous_link, Outers, ExogenousLinks),
-  ord_union(EndogenousLinks, ExogenousLinks, Links),
-  l_edges_vertices(Links, Vs),
+  maplist(exogenous_edge, Outers, ExogenousEs),
+  
+  % Edges -> vertices.
+  ord_union(EndogenousEs, ExogenousEs, Es),
+  l_edges_vertices(Es, Vs),
+  
   build_export_graph(
     Vs,
-    Links,
-    ExportGraph,
+    Es,
+    ExportG,
     [
       graph_directed(true),
-      vertex_label(ac_vertex_label(Model))
+      vertex_label(ac_vertex_label)
     ]
   ).
 
-exogenous_link(X, edge(u,_,X)).
+exogenous_edge(X, edge(ac:exogenous,_,X)).
 
-ac_vertex_label(_, u, 'Context'):- !.
-ac_vertex_label(Model, V, VLabel):-
-  Model:endogenous_variable(V, VLabel, _, _), !.
-ac_vertex_label(_, _, undefined).
+ac_vertex_label(ac:exogenous, 'Exogenous'):- !.
+ac_vertex_label(V, VLabel):-
+  rdfs_label_value(V, VLabel), !.
+ac_vertex_label(_, nolabel).

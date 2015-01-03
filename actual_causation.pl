@@ -1,10 +1,10 @@
 :- module(
   actual_causation,
   [
-    cause/3, % +Model:atom
-             % ?Cause:list(pair(atom,nonneg))
-             % ?CausalPath:ordset
-    has_cause/1 % +Model:atom
+    models/4 % +Model:iri
+             % ?Context:ordset(pair(iri,integer))
+             % +CausalFormula:compound
+             % ?Cause:ordset(pair(iri,integer))
   ]
 ).
 
@@ -13,7 +13,7 @@
 @author Wouter Beek
 @see [http://arxiv.org/abs/1106.2652](Actual causation and the art of modeling)
 @tbs Causal path restricts possible partitions.
-@version 2014/12
+@version 2014/12-2015/01
 */
 
 :- use_module(library(apply)).
@@ -22,155 +22,154 @@
 :- use_module(library(lists), except([delete/3,subset/2])).
 :- use_module(library(ordsets)).
 :- use_module(library(pairs)).
+:- use_module(library(semweb/rdf_db), except([rdf_node/1])).
 
 :- use_module(generics(list_ext)).
 :- use_module(generics(pair_ext)).
 
 :- use_module(plSet(set_theory)).
 
-:- use_module(plGraph(graph_walk)).
+:- use_module(plRdf(api/rdf_read)).
 
+:- use_module(ac(ac_build)).
 :- use_module(ac(ac_calculate_values)).
 :- use_module(ac(ac_debug)).
 :- use_module(ac(ac_read)).
 
+:- dynamic(cause0/3).
 
 
 
 
-%! cause(+Model:atom, ?Cause:list(pair), ?CausalPath:ordset) is nondet.
 
-cause(Model, AXs, Zs):-
-  causal_formula(Model, Phi0),
-  list_conjunction(Phi0, Phi),
-  endogenous_variables(Model, Vs),
+%! models(
+%!   +Model:iri,
+%!   +Context:ordset(pair(iri,integer)),
+%!   +CausalFormula:compound,
+%!   +Cause:ordset(iri)
+%! ) is semidet.
+%! models(
+%!   +Model:iri,
+%!   ?Context:ordset(pair(iri,integer)),
+%!   +CausalFormula:compound,
+%!   ?Cause:ordset(iri)
+%! ) is nondet.
+%
+% @arg CausalFormula A formula composed out of primitive events
+%      using conjunction and negation.
+% @arg Cause The variables that make up the cause.
+
+models(M, Us, Phi, Xs):-
+  % NONDET.
+  context(M, Us),
   
-  % Condition 1: Facticity.
-  % "The cause must be the case."
-  % Especially for the generative case:
-  % It does not make sense for cause and caused to be the same.
-  calculate_values(Model, Context, [], AVs),
-  pairs_keys(Phi0, PhiVars),
-  remove_pairs(AVs, PhiVars, AVs0),
-  sublist(AXs, AVs0),
-  AXs \== [],
-  (   debugging(ac)
-  ->  list_conjunction(AXs, AXs0),
-      debug_models(AXs, [], AXs0)
-  ;   true
-  ),
-  % "The caused must be the case."
-  % "The case" is what occurs under the empty assignment.
-  sat0(AVs, Phi),
-  debug_models(AXs, [], Phi),
+  % Reset cause memoization on a per-context basis.
+  retractall(cause0(M, Us, _)),
+  
+  % Make a snapshot of the database.
+  rdf_transaction(
+    models0(M, Us, Phi, Xs),
+    _,
+    [snapshot(true)]
+  ).
 
-  % Condition 2: Counterfactual under contingency.
-  % It does not make sense to involve the caused part in the construction of
-  % a contingent counterfactual.
+%! models0(
+%!   +Model:iri,
+%!   +Context:ordset(pair(iri,integer)),
+%!   +CausalFormula:compound,
+%!   +Cause:ordset(iri)
+%! ) is semidet.
+%! models0(
+%!   +Model:iri,
+%!   +Context:ordset(pair(iri,integer)),
+%!   +CausalFormula:compound,
+%!   ?Cause:ordset(iri)
+%! ) is nondet.
+
+models0(M, Us, Phi, Xs):-
+  % Set the context in the current database snapshot.
+  maplist(assign_value, Us),
+  
+  % Collect all endogenous variables.
+  endogenous_variables(M, Vs),
+  
+  % It does not make sense for cause and caused to be the same,
+  % so do not consider variables that occur in the causal formula.
+  formula_to_variables(Phi, PhiVars),
   ord_subtract(Vs, PhiVars, Vs0),
-  %%%%\+ (member(X, Xs), Model:causal_link(_-X)),
-  %%%%% The cause must be at the onsets of the causal path.
-  %%%%has_causal_path(Model, Xs, PhiVars, Zs),
+  
+  % NONDET.
+  % Split the endogenous variables into those constituting a causal path
+  % and those that are "off to the side" (condition 2).
   partition(Vs0, [A,B]),
-  % In the partition, the order is arbitrary.
-  % Thus for each binary partition we have two causal paths to try out.
+  
+  % Notice that the order in which partition members occur is arbitrary.
+  % Therefore for each binary partition we have two causal paths to try out.
   (   A = Zs,
       B = Ws
   ;   A = Ws,
       B = Zs
   ),
-  pairs_keys(AXs, Xs),
-  ord_subset(Xs, Zs),
-
-  assign_variables(Model, Xs, AXs_alt),
-  assign_variables(Model, Ws, AWs_alt),
-
+  
+  % NONDET.
+  % Find a potential cause.
+  % The cause must belong to the causal path.
+  %
+  % @tbd A cause must not only be part of the causel path;
+  %      it must be the onset of the causal path.
+  %      ```prolog
+  %      \+ (member(X, Xs), Model:causal_link(_-X)),
+  %      has_causal_path(Model, Xs, PhiVars, Zs),
+  %      ```
+  subset(Xs, Zs),
+  
+  % No subcause of a cause should be considered a cause
+  % (condition 3: minimality).
+  % Notice that smaller causes are considered first.
+  \+ ((
+    cause0(M, Us, Xs0),
+    subset(Xs0, Xs)
+  )),
+  
+  % A cause must be non-empty.
+  Xs \== [],
+  
+  % The cause must be the case (Condition 1).
+  % This means that it must consist entirely of values from the real world.
+  calculate_all_values(M, [], AVs),
+  
+  % The caused must be the case (Condition 1).
+  satisfy_formula(M, [], Phi),
+  debug_models(M, Us, [], Phi), % DEB
+  
+  % Construct a contingency under which the counterfactual
+  % can be satisfied (Condition 2).
+  % NONDET.
+  assign_variables(Xs, AXs_contingent),
+  % NONDET.
+  assign_variables(Ws, AWs_contingent),
+  
   % 2A:
-  ord_union(AXs_alt, AWs_alt, Alts1),
-  sat(AXs, Model, Alts1, not(Phi)),
-
+  ord_union(AXs_contingent, AWs_contingent, Contingency1),
+  satisfy_formula(M, Contingency1, not(Phi)),
+  
   % 2B:
   ord_subtract(Zs, Xs, ZsMinusXs),
   forall(
     (
-      sublist(Ws_sub, Ws),
-      sublist(ZsMinusXs_sub, ZsMinusXs)
+      sublist(Ws_subset, Ws),
+      sublist(ZsMinusXs_subset, ZsMinusXs)
     ),
     (
-      subpairs(AWs_alt, Ws_sub, Alts2a),
-      subpairs(AVs, ZsMinusXs_sub, Alts2b),
-      ord_union(Alts2a, Alts2b, Alts2),
-      sat(AXs, Model, Alts2, Phi)
+      subpairs(AWs_contingent, Ws_subset, Continency2a),
+      subpairs(AVs, ZsMinusXs_subset, Continency2b),
+      ord_union(Continency2a, Continency2b, Continency2),
+      satisfy_formula(M, Continency2, Phi)
     )
   ),
-
-  % Condition 3: Minimality.
-  \+ ((
-    cause0(Model, AXs_smaller, _),
-    sublist(AXs_smaller, AXs)
-  )),
-  assert(cause0(Model, AXs, Zs)).
-
-
-
-%! has_cause(+Model:atom) is semidet.
-
-has_cause(Model):-
-  once(cause(Model, _, _)).
-
-
-
-%! has_causal_path(
-%!   +Model:atom,
-%!   +CauseVars:ordset,
-%!   +CausedVars:ordset,
-%!   -PathVars:ordset
-%! ) is det.
-% A causal path must adhere to the following conditions:
-%   1. It must end in all and only caused variables.
-%   2. It must start in all and only cause variables.
-%   3. No superfluous or non-traversed variables are included.
-
-has_causal_path(Model, Xs, PhiVars, Zs):-
-  aggregate_all(
-    set(Path),
-    (
-      member(X, Xs),
-      member(Y, PhiVars),
-      path(
-        ca_vertex,
-        ca_edge,
-        ca_neighbor,
-        Model,
-        Y,
-        X,
-        Path
-      )
-    ),
-    Paths
-  ),
-  maplist(path_to_vertices, Paths, Vss),
-  ord_union(Vss, Zs).
-
-path_to_vertices([_,_|T], Vs):-
-  path_to_vertices0(T, Vs0),
-  list_to_ord_set(Vs0, Vs).
-
-path_to_vertices0([], []).
-path_to_vertices0([H], [H]):- !.
-path_to_vertices0([V,_|T1], [V|T2]):-
-  path_to_vertices0(T1, T2).
-
-ca_vertex(Model, V):-
-  Model:causal_link(V-_).
-ca_vertex(Model, V):-
-  Model:causal_link(_-V).
-
-ca_edge(Model, V-W):-
-  Model:causal_link(W-V).
-
-ca_neighbor(Model, V, W):-
-  ca_edge(Model, V-W).
+  
+  % Store this result to ensure minimality of future results.
+  assert(cause0(M, Us, Xs)).
 
 
 
@@ -179,42 +178,42 @@ ca_neighbor(Model, V, W):-
 % HELPERS %
 
 %! assign_variables(
-%!   +Model:atom,
-%!   +Variables:list,
-%!   -Assignment:list(pair)
-%! ) is det.
+%!   +Variables:list(iri),
+%!   -Assignment:list(pair(iri,integer))
+%! ) is nondet.
 
-assign_variables(Model, Xs, AXs):-
-  maplist(assignment0(Model), Xs, AXs).
-
-assignment0(Model, X, X-Val):-
-  Model:endogenous_variable(X, _, Low, High),
-  between(Low, High, Val).
-
-
-
-%! endogenous_variables(+Model:atom, -Endogenous:ordset) is det.
-% Extracts the endogenous variables from the model.
-
-endogenous_variables(Model, Vs):-
-  aggregate_all(
-    set(V),
-    Model:endogenous_variable(V, _, _, _),
-    Vs
+assign_variables(Vars, As):-
+  findall(
+    Var-Val,
+    (
+      member(Var, Vars),
+      rdf_typed_literal(Var, ac:possible_value, Val, xsd:integer)
+    ),
+    As
   ).
 
 
 
-%! list_conjunction(+List:list, -Conjunction:compound) is det.
-%! list_conjunction(-List:list, +Conjunction:compound) is det.
+%! context(+Model:iri, +Context:list(pair(iri,integer))) is semidet.
+%! context(+Model:iri, -Context:list(pair(iri,integer))) is nondet.
 
-list_conjunction([H], H).
-list_conjunction([H|T1], and(H,T2)):-
-  list_conjunction(T1, T2).
+context(Model, Context):-
+  aggregate_all(
+    set(Var),
+    outer_variable(Model, Var),
+    Vars
+  ),
+  generate_context0(Vars, Context).
+
+generate_context0([], []).
+generate_context0([Var|T1], [Var-Val|T2]):-
+  rdf_typed_literal(Var, ac:possible_value, Val, xsd:integer),
+  generate_context0(T1, T2).
 
 
 
-%! formula_to_variables(+Phi:compound, -Vars:ordset) is det.
+%! formula_to_variables(+Phi:compound, -Variables:ordset(iri)) is det.
+% Boolean combinations of primitive events.
 
 formula_to_variables(not(Phi), Vars):- !,
   formula_to_variables(Phi, Vars).
@@ -228,24 +227,9 @@ formula_to_variables(Var-_, [Var]).
 
 
 
-%! sat(
-%!   +Model:iri,
-%!   +Context:ordset(pair(iri,integer)),
-%!   +Assignment:ordset(pair(iri,integer)),
-%!   +Phi:compound
-%! ) is semidet.
+%! list_conjunction(+List:list, -Conjunction:compound) is det.
+%! list_conjunction(-List:list, +Conjunction:compound) is det.
 
-sat(Model, Context, A, Phi):-
-  calculate_values(Model, Context, A, _),
-  sat0(Phi).
-
-%! sat0(+Domain:list(pair), +Phi:compound) is semidet.
-% Satisfaction of a formula in a domain of pairs representing assignments.
-
-sat0(not(Phi)):- !,
-  \+ sat0(Phi).
-sat0(and(Phi,Psi)):- !,
-  sat0(Phi),
-  sat0(Psi).
-sat0(Var-Val):-
-  memberchk(Phi, Dom).
+list_conjunction([H], H).
+list_conjunction([H|T1], and(H,T2)):-
+  list_conjunction(T1, T2).
