@@ -1,5 +1,5 @@
 :- module(
-  ac_calculate_values,
+  ac_calc,
   [
     calculate_all_values/2, % +Model:iri
                             % -Solution:list(pair(iri,integer))
@@ -50,8 +50,8 @@ calculate_all_values0(M, Solution):-
   aggregate_all(
     set(Var-Val),
     (
-      rdf_has(M, ac:endogenous_variable, Var),
-      rdf_typed_literal(Var, ac:value, Val, xsd:integer, _)
+      rdf_has(M, aco:endogenous_variable, Var),
+      rdf_typed_literal(Var, aco:value, Val, xsd:integer, _)
     ),
     Solution
   ).
@@ -66,7 +66,7 @@ calculate_all_values0(M, Solution):-
 
 calculate_some_value_under_assignment0(M, Var, Val):-
   forall(
-    rdf_has(Var0, ac:causes, Var),
+    rdf_has(Var0, aco:causes, Var),
     calculate_some_value_under_assignment0(M, Var0, _)
   ),
   determine_value(M, Var, Val).

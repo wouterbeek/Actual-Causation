@@ -1,12 +1,18 @@
 :- module(
   ac_build_model,
   [
+    assert_model/4, % +Name:atom
+                    % +Description:atom
+                    % +Signature:list(pair(atom,list(integer))),
+                    % +StructuralEquations:list(compound)
     assert_model/5, % +Name:atom
                     % +Description:atom
                     % +Signature:list(pair(atom,list(integer))),
                     % +StructuralEquations:list(compound)
                     % -Model:iri
-    assign_value/1 % +Assignment:pair(iri,integer)
+    assign_value/1, % +Assignment:pair(iri,integer)
+    run_with_assigned_values/2 % +Assignment:list(pair(iri,integer))
+                               % :Goal
   ]
 ).
 
@@ -20,20 +26,34 @@
 :- use_module(library(aggregate)).
 :- use_module(library(apply)).
 :- use_module(library(clpfd)).
+:- use_module(library(lists), except([delete/3,subset/2])).
 :- use_module(library(semweb/rdf_db), except([rdf_node/1])).
 
 :- use_module(generics(lambda_meta)).
 
 :- use_module(plRdf(api/rdf_build)).
+:- use_module(plRdf(api/rdf_read)).
 :- use_module(plRdf(api/rdfs_build)).
 :- use_module(plRdf(api/rdfs_read)).
 :- use_module(plRdf(reification/rdf_reification_write)).
 
 :- use_module(ac(ac_read)).
 
+:- meta_predicate(run_with_assigned_values(+,0)).
 
 
 
+
+
+%! assert_model(
+%!   +Name:atom,
+%!   +Description:atom,
+%!   +Signature:list(pair(atom,list(integer))),
+%!   +StructuralEquations:list(compound)
+%! ) is det.
+
+assert_model(Name, Description, Signature, StructuralEquations):-
+  assert_model(Name, Description, Signature, StructuralEquations, _).
 
 %! assert_model(
 %!   +Name:atom,
@@ -44,7 +64,7 @@
 %! ) is det.
 
 assert_model(Name, Description, Signature, StructuralEquations, M):-
-  % ac:Model
+  % aco:Model
   rdf_create_next_resource(ac, [model], aco:'Model', ac, M),
 
   % rdfs:label
@@ -52,14 +72,14 @@ assert_model(Name, Description, Signature, StructuralEquations, M):-
 
   % dcterms:description
   rdf_assert_plain_literal(M, dcterms:description, Description, ac),
-  
-  % ac:EndogenousVariable
-  % ac:endogenous_variable
-  % ac:possible_value
+
+  % aco:EndogenousVariable
+  % aco:endogenous_variable
+  % aco:possible_value
   maplist(assert_signature(M), Signature),
-  
-  % ac:structural_equation
-  % ac:causes
+
+  % aco:structural_equation
+  % aco:causes
   maplist(assert_structural_equation(M), StructuralEquations).
 
 
@@ -70,7 +90,7 @@ assert_model(Name, Description, Signature, StructuralEquations, M):-
 %! ) is det.
 
 assert_signature(M, Name-Vals):-
-  % ac:EndogenousVariable
+  % aco:EndogenousVariable
   % rdf:type
   rdf_create_next_resource(
     ac,
@@ -79,18 +99,18 @@ assert_signature(M, Name-Vals):-
     ac,
     Var
   ),
-  
-  % ac:endogenous_variable
-  rdf_assert(M, ac:endogenous_variable, Var, ac),
-  
+
+  % aco:endogenous_variable
+  rdf_assert(M, aco:endogenous_variable, Var, ac),
+
   % rdfs:label
   rdfs_assert_label(Var, Name, ac),
-  
-  % ac:possible_value
+
+  % aco:possible_value
   maplist(
     \Val^rdf_assert_typed_literal(
       Var,
-      ac:possible_value,
+      aco:possible_value,
       Val,
       xsd:integer,
       ac
@@ -109,21 +129,39 @@ assert_structural_equation(M, Eq):-
   Eq = #=(Left,Right),
   term_to_atom_subterms(Right, Rights),
   maplist(variable(M), [Left|Rights], [LeftVar|RightVars]),
-  
-  % ac:causes
-  maplist(\RightVar^rdf_assert(RightVar, ac:causes, LeftVar, ac), RightVars),
 
-  % ac:structural_equation
+  % aco:causes
+  maplist(\RightVar^rdf_assert(RightVar, aco:causes, LeftVar, ac), RightVars),
+
+  % aco:structural_equation
   with_output_to(atom(Eq0), write_canonical(Eq)),
-  rdf_assert_simple_literal(LeftVar, ac:structural_equation, Eq0, ac).
+  rdf_assert_simple_literal(LeftVar, aco:structural_equation, Eq0, ac).
 
 
 
 %! assign_value(+Assignment:pair(iri,integer)) is det.
 
 assign_value(Var-Val):-
-  rdf_retractall(Var, ac:value, _),
-  rdf_assert_typed_literal(Var, ac:value, Val, xsd:integer, ac).
+  rdf_retractall(Var, aco:value, _),
+  rdf_assert_typed_literal(Var, aco:value, Val, xsd:integer, ac).
+
+
+%! run_with_assigned_values(+Assignment:list(pair(iri,integer)), :Goal) .
+
+run_with_assigned_values(As, Goal):-
+  findall(
+    Var-OldVal,
+    (
+      member(Var-_, As),
+      rdf_typed_literal(Var, aco:value, OldVal, xsd:integer)
+    ),
+    OldAs
+  ),
+  setup_call_cleanup(
+    maplist(assign_value, As),
+    Goal,
+    maplist(assign_value, OldAs)
+  ).
 
 
 

@@ -1,5 +1,5 @@
 :- module(
-  actual_causal_graph,
+  ac_export,
   [
     causal_graph/2 % +Model:iri
                    % -ExportGraph:compound
@@ -38,8 +38,8 @@ causal_graph(M, ExportG):-
   aggregate_all(
     set(edge(X,_,Y)),
     (
-      rdf_has(X, ac:causes, Y),
-      rdf_has(M, ac:endogenous_variable, X)
+      rdf_has(X, aco:causes, Y),
+      rdf_has(M, aco:endogenous_variable, X)
     ),
     EndogenousEs
   ),
@@ -71,9 +71,9 @@ causal_graph(M, ExportG):-
     ]
   ).
 
-exogenous_edge(X, edge(ac:exogenous,_,X)).
+exogenous_edge(X, edge(aco:exogenous,_,X)).
 
-ac_vertex_label(ac:exogenous, 'Exogenous'):- !.
+ac_vertex_label(aco:exogenous, 'Exogenous'):- !.
 ac_vertex_label(V, VLabel):-
   rdfs_label_value(V, VLabel), !.
 ac_vertex_label(_, nolabel).

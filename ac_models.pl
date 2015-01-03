@@ -1,5 +1,5 @@
 :- module(
-  actual_causation,
+  ac_models,
   [
     models/4 % +Model:iri
              % ?Context:ordset(pair(iri,integer))
@@ -32,7 +32,7 @@
 :- use_module(plRdf(api/rdf_read)).
 
 :- use_module(ac(ac_build)).
-:- use_module(ac(ac_calculate_values)).
+:- use_module(ac(ac_calc)).
 :- use_module(ac(ac_debug)).
 :- use_module(ac(ac_read)).
 
@@ -62,16 +62,15 @@
 models(M, Us, Phi, Xs):-
   % NONDET.
   context(M, Us),
-
+  
   % Reset cause memoization on a per-context basis.
   retractall(cause0(M, Us, _)),
-
-  % Make a snapshot of the database.
-  rdf_transaction(
-    models0(M, Us, Phi, Xs),
-    _,
-    [snapshot(true)]
-  ).
+  
+  % Set the context in the current database snapshot.
+  run_with_assigned_values(Us, models0(M, Us, Phi, Xs)),
+  
+  % Store this result to ensure minimality of future results.
+  assert(cause0(M, Us, Xs)).
 
 %! models0(
 %!   +Model:iri,
@@ -87,9 +86,6 @@ models(M, Us, Phi, Xs):-
 %! ) is nondet.
 
 models0(M, Us, Phi, Xs):-
-  % Set the context in the current database snapshot.
-  maplist(assign_value, Us),
-
   % Collect all endogenous variables.
   endogenous_variables(M, Vs),
 
@@ -166,14 +162,9 @@ models0(M, Us, Phi, Xs):-
       subpairs(AVs, ZsMinusXs_subset, Contingency2b),
       ord_union(Contingency2a, Contingency2b, Contingency2),
       debug_models(M, Us, Contingency2, Phi), % DEB
-gtrace,
       satisfy_formula(M, Contingency2, Phi)
     )
-  ),
-
-  % Store this result to ensure minimality of future results.
-  assert(cause0(M, Us, Xs)).
-
+  ).
 
 
 
@@ -188,7 +179,7 @@ gtrace,
 assign_variables([], []).
 assign_variables([Var|T1], [Var-Val|T2]):-
   % NONDET.
-  rdf_typed_literal(Var, ac:possible_value, Val, xsd:integer),
+  rdf_typed_literal(Var, aco:possible_value, Val, xsd:integer),
   assign_variables(T1, T2).
 
 
@@ -212,7 +203,7 @@ context1(M, Us):-
 
 context2([], []).
 context2([Var|T1], [Var-Val|T2]):-
-  rdf_typed_literal(Var, ac:possible_value, Val, xsd:integer),
+  rdf_typed_literal(Var, aco:possible_value, Val, xsd:integer),
   context2(T1, T2).
 
 

@@ -50,16 +50,3 @@ user:current_html_style(menu_page).
 % plTabular
 :- use_module(plTabular(rdf_tabular)).
 user:web_module(plTabular, rdf_tabular).
-
-
-
-% Samples models.
-
-:- use_module(ac(models/billy_suzy_bottle)).
-:- use_module(ac(models/careless_camper)).
-:- use_module(ac(models/forest_fire)).
-:- use_module(ac(models/trumping)).
-
-% Top-level access.
-
-:- use_module(ac(actual_causation)).

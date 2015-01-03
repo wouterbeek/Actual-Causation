@@ -66,7 +66,7 @@ assignment_entry(Var-Val) -->
 debug_model(M):-
   aggregate_all(
     set(Var),
-    rdf_has(M, ac:endogenous_variable, Var),
+    rdf_has(M, aco:endogenous_variable, Var),
     Vars
   ),
   forall(
@@ -77,7 +77,7 @@ debug_model(M):-
       forall(
         rdf(Var, P, literal(type(xsd:integer,OLabel))),
         (
-          rdf_global_id(ac:PLabel, P),
+          rdf_global_id(aco:PLabel, P),
           format(user_output, '\t~a: ~a\n', [PLabel,OLabel])
         )
       )
