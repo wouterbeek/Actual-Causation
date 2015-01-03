@@ -122,6 +122,7 @@ assert_structural_equation(M, Eq):-
 %! assign_value(+Assignment:pair(iri,integer)) is det.
 
 assign_value(Var-Val):-
+  rdf_retractall(Var, ac:value, _),
   rdf_assert_typed_literal(Var, ac:value, Val, xsd:integer, ac).
 
 

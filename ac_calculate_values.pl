@@ -1,8 +1,7 @@
 :- module(
   ac_calculate_values,
   [
-    calculate_all_values/3, % +Model:iri
-                            % +Assignment:list(pair(iri,integer))
+    calculate_all_values/2, % +Model:iri
                             % -Solution:list(pair(iri,integer))
     satisfy_formula/3 % +Model:iri
                       % +Assignment:list(pair(iri,integer))
@@ -23,38 +22,31 @@
 :- use_module(plRdf(api/rdf_read)).
 
 :- use_module(ac(ac_build)).
+:- use_module(ac(ac_debug)).
 :- use_module(ac(ac_read)).
 
 
 
 
 
-%! calculate_all_values(
-%!   +Model:iri,
-%!   +Assignment:list(pair(iri,integer)),
-%!   -Solution:list(pair(iri,integer))
-%! ) is det.
+%! calculate_all_values(+Model:iri, -Solution:list(pair(iri,integer))) is det.
 % Use a database snapshot for a specific counterfactual with a contingency.
 % If Assignment is the empty list then Solution represents what is the case,
 % i.e., it describes the real world.
 
-calculate_all_values(M, As, Solution):-
+calculate_all_values(M, Solution):-
   rdf_transaction(
-    calculate_all_values0(M, As, Solution),
+    calculate_all_values0(M, Solution),
     _,
     [snapshot(true)]
   ).
 
-calculate_all_values0(M, As, Solution):-
-  maplist(assign_value, As),
-  calculate_all_values_under_assignment0(M, Solution).
-
-calculate_all_values_under_assignment0(M, Solution):-
+calculate_all_values0(M, Solution):-
   determined_variable(M, Var),
   determine_value(M, Var, Val),
   assign_value(Var-Val),
-  calculate_all_values_under_assignment0(M, Solution).
-calculate_all_values_under_assignment0(M, Solution):-
+  calculate_all_values0(M, Solution).
+calculate_all_values0(M, Solution):-
   aggregate_all(
     set(Var-Val),
     (
@@ -96,6 +88,7 @@ satisfy_formula(M, As, Phi):-
 
 satisfy_formula0(M, As, Phi):-
   maplist(assign_value, As),
+  debug_model(M),
   satisfy_formula_under_assignment(M, Phi).
 
 satisfy_formula_under_assignment(M, and(Phi,Psi)):- !,

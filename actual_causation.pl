@@ -60,7 +60,6 @@
 % @arg Cause The variables that make up the cause.
 
 models(M, Us, Phi, Xs):-
-gtrace,
   % NONDET.
   context(M, Us),
 
@@ -137,7 +136,7 @@ models0(M, Us, Phi, Xs):-
 
   % The cause must be the case (Condition 1).
   % This means that it must consist entirely of values from the real world.
-  calculate_all_values(M, [], AVs),
+  calculate_all_values(M, AVs),
 
   % The caused must be the case (Condition 1).
   satisfy_formula(M, [], Phi),
@@ -153,7 +152,8 @@ models0(M, Us, Phi, Xs):-
   % 2A:
   ord_union(AXs_contingent, AWs_contingent, Contingency1),
   satisfy_formula(M, Contingency1, not(Phi)),
-
+  debug_models(M, Us, Contingency1, not(Phi)), % DEB
+  
   % 2B:
   ord_subtract(Zs, Xs, ZsMinusXs),
   forall(
@@ -162,10 +162,12 @@ models0(M, Us, Phi, Xs):-
       sublist(ZsMinusXs_subset, ZsMinusXs)
     ),
     (
-      subpairs(AWs_contingent, Ws_subset, Continency2a),
-      subpairs(AVs, ZsMinusXs_subset, Continency2b),
-      ord_union(Continency2a, Continency2b, Continency2),
-      satisfy_formula(M, Continency2, Phi)
+      subpairs(AWs_contingent, Ws_subset, Contingency2a),
+      subpairs(AVs, ZsMinusXs_subset, Contingency2b),
+      ord_union(Contingency2a, Contingency2b, Contingency2),
+      debug_models(M, Us, Contingency2, Phi), % DEB
+gtrace,
+      satisfy_formula(M, Contingency2, Phi)
     )
   ),
 
@@ -183,15 +185,11 @@ models0(M, Us, Phi, Xs):-
 %!   -Assignment:list(pair(iri,integer))
 %! ) is nondet.
 
-assign_variables(Vars, As):-
-  findall(
-    Var-Val,
-    (
-      member(Var, Vars),
-      rdf_typed_literal(Var, ac:possible_value, Val, xsd:integer)
-    ),
-    As
-  ).
+assign_variables([], []).
+assign_variables([Var|T1], [Var-Val|T2]):-
+  % NONDET.
+  rdf_typed_literal(Var, ac:possible_value, Val, xsd:integer),
+  assign_variables(T1, T2).
 
 
 

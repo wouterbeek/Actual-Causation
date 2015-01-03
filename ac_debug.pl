@@ -1,6 +1,7 @@
 :- module(
   ac_debug,
   [
+    debug_model/1, % +Model:iri
     debug_models/4 % +Model:iri
                    % +Context:list(pair(iri,integer))
                    % +Assignment:ordset(pair(iri,integer))
@@ -14,8 +15,11 @@
 @version 2014/12-2015/01
 */
 
+:- use_module(library(aggregate)).
+:- use_module(library(apply)).
 :- use_module(library(debug)).
 :- use_module(library(lists), except([delete/3,subset/2])).
+:- use_module(library(semweb/rdf_db), except([rdf_node/1])).
 
 :- use_module(plDcg(dcg_atom)).
 :- use_module(plDcg(dcg_bracket)).
@@ -25,6 +29,7 @@
 :- use_module(plDcg(dcg_unicode)).
 
 :- use_module(plRdf(api/rdfs_read)).
+:- use_module(plRdf(rdf_name)).
 
 
 
@@ -53,6 +58,31 @@ assignment_entry(Var-Val) -->
   atom(VarLabel),
   code_radix(hex('2190')),
   integer(Val).
+
+
+
+%! debug_model(+Model:iri) is det.
+
+debug_model(M):-
+  aggregate_all(
+    set(Var),
+    rdf_has(M, ac:endogenous_variable, Var),
+    Vars
+  ),
+  forall(
+    member(Var, Vars),
+    (
+      once(rdfs_label_value(Var, SLabel)),
+      format(user_output, '~a: \n', [SLabel]),
+      forall(
+        rdf(Var, P, literal(type(xsd:integer,OLabel))),
+        (
+          rdf_global_id(ac:PLabel, P),
+          format(user_output, '\t~a: ~a\n', [PLabel,OLabel])
+        )
+      )
+    )
+  ).
 
 
 
@@ -106,6 +136,7 @@ formula(Var-Val) -->
 models(M, Us, As, Phi) -->
   bracketed(langular, model_context0(M, Us)),
   models,
+  " ",
   assignment(As),
   formula(Phi).
 
