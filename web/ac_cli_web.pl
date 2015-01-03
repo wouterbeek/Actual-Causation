@@ -14,7 +14,9 @@
 
 :- use_module(plXml(xml_dom)).
 
-:- use_module(plHtml(html_list)).
+:- use_module(plHtml(html_pl_term)).
+:- use_module(plHtml(html_table)).
+:- use_module(plHtml(html_tuple)).
 
 :- use_module(plServer(templates/menu_page)). % HTML template
 
@@ -23,6 +25,7 @@
 :- use_module(plRdf(api/rdf_read)).
 :- use_module(plRdf(api/rdfs_read)).
 
+:- use_module(ac(ac_read)).
 :- use_module(ac(actual_causal_graph)).
 :- use_module(ac(actual_causation)).
 :- use_module(ac(models/ac_test_models)).
@@ -48,7 +51,7 @@ cli_simulate(Request):-
   reply_html_page(
     menu_page,
     [title('Actual-Causation CLI :: Causes')],
-    [\description(M),\causal_graph(M)]
+    [\description(M),\causal_graph(M),\causes(M)]
   ).
 
 
@@ -57,9 +60,8 @@ cli_simulate(Request):-
 
 % GRAMMAR %
 
-assignment(Model, Var-Val) -->
-  {Model:endogenous_variable(Var, Name, _, _)},
-  html([Name,' = ',Val]).
+assignment_entry(Var-Val) -->
+  html([\var(Var),=,\val(Val)]).
 
 causal_graph(M) -->
   {
@@ -73,38 +75,44 @@ causal_graph(M) -->
 
 causes(M) -->
   {
+    variable(M, match, VarM),
+    variable(M, lightning, VarL),
+    Us = [VarL-1,VarM-1],
+    variable(M, fire, VarF),
     aggregate_all(
-      set(Us-Xs),
-      models(M, Us, Phi, Xs),
-      Pairs
+      set([assignment(Us),vars(Xs)]),
+      models(M, Us, VarF-1, Xs),
+      DataRows
     )
   },
   html([
-    h1('Causes'),
-    \html_list(Causes, cause(Model), [ordered(true)])
-  ]).
-
-cause(Model, As-Path) -->
-  {format(atom(Atom), '~w', [Path])},
-  html([
-    p(Atom),
-    \html_list(As, assignment(Model), [ordered(false)])
-  ]).
-
-context(Model) -->
-  {
-    Model:context(Values),
-    format(atom(Values0), '~w', [Values])
-  },
-  html([
-    h1('Context'),
-    p(Values0)
+    h1('Contexts & Causes'),
+    \html_table(
+      html('Contexts & Causes'),
+      html_ac,
+      [['Contexts','Cause']|DataRows],
+      [header_row(true),indexed(true)]
+    )
   ]).
 
 description(M) -->
   {rdf_plain_literal(M, dcterms:description, Description, _)}, !,
   html([h1('Description'),p(Description)]).
 description(_) --> html([]).
+
+html_ac(assignment(L)) --> !,
+  html_tuple(assignment_entry, L).
+html_ac(vars(L)) --> !,
+  html_tuple(var, L).
+html_ac(Term) -->
+  html_pl_term(Term).
+
+val(Val) -->
+  html(span(class=val,\html_pl_term(integer(Val)))).
+
+var(Var) -->
+  {once(rdfs_label_value(Var, VarLabel))},
+  html(span(class=var,VarLabel)).
 
 
 

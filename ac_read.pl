@@ -53,6 +53,8 @@ causal_formula(Model, Pairs):-
 %! determine_value(+Model:iri, +Variable:iri, -Value:integer) is det.
 % Succeeds for the determined value of the given variable.
 
+determine_value(_, Var, Val):-
+  rdf_typed_literal(Var, ac:value, Val, xsd:integer), !.
 determine_value(M, Var, Val):-
   rdf_simple_literal(Var, ac:structural_equation, Eq0),
   read_term_from_atom(Eq0, Eq, []),
@@ -74,7 +76,7 @@ determined_variable(M, Var):-
   forall(
     rdf_has(Var0, ac:causes, Var),
     rdf_has(Var0, ac:value, _)
-  ).
+  ), !.
 
 
 

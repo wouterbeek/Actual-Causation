@@ -19,6 +19,7 @@
 
 :- use_module(plDcg(dcg_atom)).
 :- use_module(plDcg(dcg_bracket)).
+:- use_module(plDcg(dcg_cardinal)).
 :- use_module(plDcg(dcg_code)).
 :- use_module(plDcg(dcg_generics)).
 :- use_module(plDcg(dcg_unicode)).
@@ -51,8 +52,7 @@ assignment_entry(Var-Val) -->
   {rdfs_label_value(Var, VarLabel)},
   atom(VarLabel),
   code_radix(hex('2190')),
-  {rdfs_label_value(Val, ValLabel)},
-  atom(ValLabel).
+  integer(Val).
 
 
 
@@ -92,8 +92,7 @@ formula(Var-Val) -->
   {rdfs_label_value(Var, VarLabel)},
   atom(VarLabel),
   "=",
-  {rdfs_label_value(Val, ValLabel)},
-  atom(ValLabel).
+  integer(Val).
 
 
 

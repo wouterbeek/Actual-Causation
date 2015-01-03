@@ -60,12 +60,13 @@
 % @arg Cause The variables that make up the cause.
 
 models(M, Us, Phi, Xs):-
+gtrace,
   % NONDET.
   context(M, Us),
-  
+
   % Reset cause memoization on a per-context basis.
   retractall(cause0(M, Us, _)),
-  
+
   % Make a snapshot of the database.
   rdf_transaction(
     models0(M, Us, Phi, Xs),
@@ -89,20 +90,20 @@ models(M, Us, Phi, Xs):-
 models0(M, Us, Phi, Xs):-
   % Set the context in the current database snapshot.
   maplist(assign_value, Us),
-  
+
   % Collect all endogenous variables.
   endogenous_variables(M, Vs),
-  
+
   % It does not make sense for cause and caused to be the same,
   % so do not consider variables that occur in the causal formula.
   formula_to_variables(Phi, PhiVars),
   ord_subtract(Vs, PhiVars, Vs0),
-  
+
   % NONDET.
   % Split the endogenous variables into those constituting a causal path
   % and those that are "off to the side" (condition 2).
   partition(Vs0, [A,B]),
-  
+
   % Notice that the order in which partition members occur is arbitrary.
   % Therefore for each binary partition we have two causal paths to try out.
   (   A = Zs,
@@ -110,7 +111,7 @@ models0(M, Us, Phi, Xs):-
   ;   A = Ws,
       B = Zs
   ),
-  
+
   % NONDET.
   % Find a potential cause.
   % The cause must belong to the causal path.
@@ -122,7 +123,7 @@ models0(M, Us, Phi, Xs):-
   %      has_causal_path(Model, Xs, PhiVars, Zs),
   %      ```
   subset(Xs, Zs),
-  
+
   % No subcause of a cause should be considered a cause
   % (condition 3: minimality).
   % Notice that smaller causes are considered first.
@@ -130,29 +131,29 @@ models0(M, Us, Phi, Xs):-
     cause0(M, Us, Xs0),
     subset(Xs0, Xs)
   )),
-  
+
   % A cause must be non-empty.
   Xs \== [],
-  
+
   % The cause must be the case (Condition 1).
   % This means that it must consist entirely of values from the real world.
   calculate_all_values(M, [], AVs),
-  
+
   % The caused must be the case (Condition 1).
   satisfy_formula(M, [], Phi),
   debug_models(M, Us, [], Phi), % DEB
-  
+
   % Construct a contingency under which the counterfactual
   % can be satisfied (Condition 2).
   % NONDET.
   assign_variables(Xs, AXs_contingent),
   % NONDET.
   assign_variables(Ws, AWs_contingent),
-  
+
   % 2A:
   ord_union(AXs_contingent, AWs_contingent, Contingency1),
   satisfy_formula(M, Contingency1, not(Phi)),
-  
+
   % 2B:
   ord_subtract(Zs, Xs, ZsMinusXs),
   forall(
@@ -167,7 +168,7 @@ models0(M, Us, Phi, Xs):-
       satisfy_formula(M, Continency2, Phi)
     )
   ),
-  
+
   % Store this result to ensure minimality of future results.
   assert(cause0(M, Us, Xs)).
 
@@ -197,18 +198,24 @@ assign_variables(Vars, As):-
 %! context(+Model:iri, +Context:list(pair(iri,integer))) is semidet.
 %! context(+Model:iri, -Context:list(pair(iri,integer))) is nondet.
 
-context(Model, Context):-
+context(M, Us):-
+  nonvar(Us), !,
+  context1(M, Us), !.
+context(M, Us):-
+  context1(M, Us).
+
+context1(M, Us):-
   aggregate_all(
     set(Var),
-    outer_variable(Model, Var),
+    outer_variable(M, Var),
     Vars
   ),
-  generate_context0(Vars, Context).
+  context2(Vars, Us).
 
-generate_context0([], []).
-generate_context0([Var|T1], [Var-Val|T2]):-
+context2([], []).
+context2([Var|T1], [Var-Val|T2]):-
   rdf_typed_literal(Var, ac:possible_value, Val, xsd:integer),
-  generate_context0(T1, T2).
+  context2(T1, T2).
 
 
 
