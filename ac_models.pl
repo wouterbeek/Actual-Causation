@@ -53,19 +53,20 @@
 %! ) is nondet.
 
 calculate_models(M, Us, Phi_atom, Xs, Zs, Models):-
+  read_term_from_atom(Phi_atom, Phi_term, []),
+  instantiate_term(M, var, Phi_term, Phi),
+
   % NONDET.
   context(M, Us),
 
   % Reset cause memoization on a per-context basis.
-  retractall(cause0(M, Us, Phi_atom, _)),
+  retractall(cause0(M, Us, Phi, _)),
 
   % Set the context in the current database snapshot.
-  read_term_from_atom(Phi_atom, Phi_term, []),
-  instantiate_term(M, var, Phi_term, Phi),
   run_with_assigned_values(Us, calculate_models0(M, Us, Phi, Xs, Zs)),
 
   % Store this result to ensure minimality of future results.
-  assert(cause0(M, Us, Phi_atom, Xs)),
+  assert(cause0(M, Us, Phi, Xs)),
   assert_models(M, Us, Phi_term, Xs, Zs, Models).
 
 %! calculate_models0(
@@ -84,8 +85,13 @@ calculate_models(M, Us, Phi_atom, Xs, Zs, Models):-
 %! ) is nondet.
 
 calculate_models0(M, Us, Phi, Xs, Zs):-
+  % The caused must be the case (Condition 1).
+  satisfy_formula(M, [], Phi),
+  debug_models(M, Us, [], Phi), % DEB
+
   % Collect all endogenous variables.
-  endogenous_variables(M, Vs),
+  calculate_all_values(M, AVs),
+  pairs_keys(AVs, Vs),
 
   % It does not make sense for cause and caused to be the same,
   % so do not consider variables that occur in the causal formula.
@@ -115,6 +121,9 @@ calculate_models0(M, Us, Phi, Xs, Zs):-
   %      \+ (member(X, Xs), Model:causal_link(_-X)),
   %      has_causal_path(Model, Xs, PhiVars, Zs),
   %      ```
+  %
+  % A cause must be the case (Condition 1).
+  % This means that it must consist entirely of values from the real world.
   subset(Xs, Zs),
 
   % No subcause of a cause should be considered a cause
@@ -127,14 +136,6 @@ calculate_models0(M, Us, Phi, Xs, Zs):-
 
   % A cause must be non-empty.
   Xs \== [],
-
-  % The cause must be the case (Condition 1).
-  % This means that it must consist entirely of values from the real world.
-  calculate_all_values(M, AVs),
-
-  % The caused must be the case (Condition 1).
-  satisfy_formula(M, [], Phi),
-  debug_models(M, Us, [], Phi), % DEB
 
   % Construct a contingency under which the counterfactual
   % can be satisfied (Condition 2).

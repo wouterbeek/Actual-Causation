@@ -19,10 +19,7 @@
 :- use_module(library(apply)).
 :- use_module(library(semweb/rdf_db), except([rdf_node/1])).
 
-:- use_module(plRdf(api/rdf_read)).
-
 :- use_module(ac(ac_build)).
-:- use_module(ac(ac_debug)).
 :- use_module(ac(ac_read)).
 
 
@@ -69,7 +66,8 @@ calculate_some_value_under_assignment0(M, Var, Val):-
     rdf_has(Var0, aco:causes, Var),
     calculate_some_value_under_assignment0(M, Var0, _)
   ),
-  determine_value(M, Var, Val).
+  determine_value(M, Var, Val),
+  assign_value(Var-Val).
 
 
 

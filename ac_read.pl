@@ -8,8 +8,6 @@
                        % -Value:integer
     determined_variable/2, % +Model:iri
                            % -Variable:iri
-    endogenous_variables/2, % +Model:iri
-                            % -Endogenous:ordset(iri)
     outer_variable/2, % +Model:iri
                       % -Variable:iri
     potential_value/2, % +Variable:iri
@@ -27,7 +25,6 @@
 */
 
 :- use_module(library(aggregate)).
-:- use_module(library(apply)).
 :- use_module(library(semweb/rdf_db), except([rdf_node/1])).
 
 :- use_module(plRdf(api/rdf_read)).
@@ -53,7 +50,7 @@ actual_value(Var, Val):-
 determine_value(_, Var, Val):-
 	actual_value(Var, Val), !.
 determine_value(M, Var, Val):-
-  rdf_simple_literal(Var, aco:structural_equation, Eq0),
+  once(rdf_simple_literal(Var, aco:structural_equation, Eq0)),
   read_term_from_atom(Eq0, Eq, []),
   Eq = #=(_,Right0),
   instantiate_term(M, val, Right0, Right),
@@ -74,18 +71,6 @@ determined_variable(M, Var):-
     rdf_has(Var0, aco:causes, Var),
     actual_value(Var0, _)
   ), !.
-
-
-
-%! endogenous_variables(+Model:iri, -Endogenous:ordset(iri)) is det.
-% Extracts the endogenous variables from the model.
-
-endogenous_variables(M, Vs):-
-  aggregate_all(
-    set(V),
-    rdf_has(M, aco:endogenous_variable, V),
-    Vs
-  ).
 
 
 
@@ -113,4 +98,4 @@ potential_value(Var, Val):-
 
 variable(M, Name, Var):-
   rdf_has(M, aco:endogenous_variable, Var),
-  rdfs_label_value(Var, Name).
+  rdfs_label_value(Var, Name), !.

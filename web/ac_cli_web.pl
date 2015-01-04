@@ -135,10 +135,10 @@ causal_path(Models) -->
 
 causes(M) -->
   {
-    rdf_simple_literal(M, aco:default_causal_formula, Phi_atom),
+    once(rdf_simple_literal(M, aco:default_causal_formula, Phi_atom)),
     read_term_from_atom(Phi_atom, Phi_term, []),
     instantiate_term(M, var, Phi_term, Phi),
-    
+
     aggregate_all(
       set([assignment(Us),vars(Xs),vars(Zs),uri(Location,'$@$')]),
       (

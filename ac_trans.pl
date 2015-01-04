@@ -31,6 +31,8 @@ Translation from natural language input and RDF representation.
 %!   -InstantiatedTerm:compound
 %! ) is det.
 
+instantiate_term(_, _, N, N):-
+	integer(N), !.
 instantiate_term(M, Mode, Name, X):-
   atom(Name), !,
   variable(M, Name, Var),
