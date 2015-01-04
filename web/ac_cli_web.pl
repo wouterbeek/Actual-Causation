@@ -94,10 +94,9 @@ causal_graph(M) -->
 
 causes(M) -->
   {
-gtrace,
     aggregate_all(
-      set([assignment(Us),vars(Xs)]),
-      models(M, Us, _, Xs),
+      set([assignment(Us),vars(Xs),vars(Zs)]),
+      models(M, Us, _, Xs, Zs),
       DataRows
     )
   },
@@ -105,7 +104,7 @@ gtrace,
     \html_table(
       html(['Contexts & Causes of model ',\rdf_term_html(plTabular, M)]),
       html_ac,
-      [['Contexts','Cause']|DataRows],
+      [['Contexts','Cause','Causal path']|DataRows],
       [header_row(true),indexed(true)]
     )
   ).
@@ -140,16 +139,17 @@ list_models(HandlerId) -->
 signature(M) -->
   {
     aggregate_all(
-      set([Var,Low,High]),
+      set([Var,Name,Low,High]),
       (
         rdf_has(M, aco:endogenous_variable, Var),
+        rdfs_label_value(Var, Name),
         rdf_has(Var, aco:range, Range),
         rdf_typed_literal(Range, aco:low, Low, xsd:integer),
         rdf_typed_literal(Range, aco:high, High, xsd:integer)
       ),
       DataRows
     ),
-    HeaderRow = ['Variable','Low','High']
+    HeaderRow = ['Variable','Name','Low','High']
   },
   rdf_html_table(
     html(['Signature of model ',\rdf_term_html(plTabular, M)]),

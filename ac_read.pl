@@ -35,6 +35,8 @@
 :- use_module(plRdf(api/rdf_read)).
 :- use_module(plRdf(api/rdfs_read)).
 
+:- use_module(ac(ac_trans)).
+
 
 
 
@@ -50,7 +52,7 @@ actual_value(Var, Val):-
 %! causal_formula(+Model:iri, -CausalFormula:compound) is det.
 
 causal_formula(M, Phi):-
-  rdf_simple_literal(M, aco:causal_formula, Phi_atom),
+  rdf_simple_literal(M, aco:default_causal_formula, Phi_atom),
   read_term_from_atom(Phi_atom, Phi_term, []),
   instantiate_term(M, var, Phi_term, Phi).
 
@@ -78,10 +80,10 @@ determine_value(M, Var, Val):-
 
 determined_variable(M, Var):-
   rdf_has(M, aco:endogenous_variable, Var),
-  \+ rdf_has(Var, aco:value, _),
+  \+ actual_value(Var, _),
   forall(
     rdf_has(Var0, aco:causes, Var),
-    rdf_has(Var0, aco:value, _)
+    actual_value(Var0, _)
   ), !.
 
 
@@ -123,28 +125,3 @@ potential_value(Var, Val):-
 variable(M, Name, Var):-
   rdf_has(M, aco:endogenous_variable, Var),
   rdfs_label_value(Var, Name).
-
-
-
-
-
-% HELPERS %
-
-%! instantiate_term(
-%!   +Module:iri,
-%!   +Mode:oneof([val,var]),
-%!   +Term:compound,
-%!   -InstantiatedTerm:compound
-%! ) is det.
-
-instantiate_term(M, Mode, Name, X):-
-  atom(Name), !,
-  variable(M, Name, Var),
-  (   Mode == val
-  ->  rdf_typed_literal(Var, aco:value, X, xsd:integer)
-  ;   X = Var
-  ).
-instantiate_term(M, Mode, Expr1, Expr2):-
-  Expr1 =.. [Pred|Args1],
-  maplist(instantiate_term(M, Mode), Args1, Args2),
-  Expr2 =.. [Pred|Args2].

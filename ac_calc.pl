@@ -51,7 +51,7 @@ calculate_all_values0(M, Solution):-
     set(Var-Val),
     (
       rdf_has(M, aco:endogenous_variable, Var),
-      rdf_typed_literal(Var, aco:value, Val, xsd:integer, _)
+      actual_value(Var, Val)
     ),
     Solution
   ).
@@ -88,7 +88,7 @@ satisfy_formula(M, As, Phi):-
 
 satisfy_formula0(M, As, Phi):-
   maplist(assign_value, As),
-  debug_model(M),
+  %debug_model(M), % DEB
   satisfy_formula_under_assignment(M, Phi).
 
 satisfy_formula_under_assignment(M, and(Phi,Psi)):- !,

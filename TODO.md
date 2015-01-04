@@ -2,16 +2,17 @@ TODO
 ====
 
 [ ] Implementation:
-  [ ] Add RDFS schema for AC models.
+  [o3] Add RDFS schema for AC models.
   [x] Rewrite of AC simulator using RDF models.
   [ ] Store structural equations using IRIs and internal structure.
   [ ] Causal formulas using IRIs and internal structure.
   [x] RDF term writing in signature HTML table.
-  [o] Remove old models.
-  [ ] Check why simulations no longer work.
-  [ ] Display causal formula in Web interface.
-  [ ] Make causes in table clickable and color cause in graphic.
-  [ ] Return causal path next to cuase. Color causal path as well as cause.
+  [o1] Remove old models.
+  [o1] Check why simulations no longer work.
+  [o1] Display causal formula in Web interface.
+  [o2] Make causes in table clickable and color cause in graphic.
+  [o2] Return causal path next to cuase. Color causal path as well as cause.
+  [ ] Allow models to be entered via an HTML form.
 [ ] Modeling:
   [ ] Golden standard: a collection of examples.
   [ ] Expressivity: can we express common intuitions in terms of causation?

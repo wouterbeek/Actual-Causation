@@ -1,10 +1,11 @@
 :- module(
   ac_models,
   [
-    models/4 % +Model:iri
+    models/5 % +Model:iri
              % ?Context:ordset(pair(iri,integer))
-             % ?CausalFormula:compound
+             % +CausalFormula:compound
              % ?Cause:ordset(pair(iri,integer))
+             % -CausalPath:ordset(iri)
   ]
 ).
 
@@ -44,22 +45,13 @@
 
 %! models(
 %!   +Model:iri,
-%!   +Context:ordset(pair(iri,integer)),
-%!   ?CausalFormula:compound,
-%!   +Cause:ordset(iri)
-%! ) is semidet.
-%! models(
-%!   +Model:iri,
 %!   ?Context:ordset(pair(iri,integer)),
-%!   ?CausalFormula:compound,
-%!   ?Cause:ordset(iri)
+%!   +CausalFormula:compound,
+%!   ?Cause:ordset(iri),
+%!   -CausalPath:ordset(iri)
 %! ) is nondet.
-%
-% @arg CausalFormula A formula composed out of primitive events
-%      using conjunction and negation.
-% @arg Cause The variables that make up the cause.
 
-models(M, Us, Phi, Xs):-
+models(M, Us, Phi, Xs, Zs):-
   (   var(Phi)
   ->  causal_formula(M, Phi)
   ;   true
@@ -72,7 +64,7 @@ models(M, Us, Phi, Xs):-
   retractall(cause0(M, Us, _)),
 
   % Set the context in the current database snapshot.
-  run_with_assigned_values(Us, models0(M, Us, Phi, Xs)),
+  run_with_assigned_values(Us, models0(M, Us, Phi, Xs, Zs)),
 
   % Store this result to ensure minimality of future results.
   assert(cause0(M, Us, Xs)).
@@ -81,16 +73,18 @@ models(M, Us, Phi, Xs):-
 %!   +Model:iri,
 %!   +Context:ordset(pair(iri,integer)),
 %!   +CausalFormula:compound,
-%!   +Cause:ordset(iri)
+%!   +Cause:ordset(iri),
+%!   -CausalPath:ordset(iri)
 %! ) is semidet.
 %! models0(
 %!   +Model:iri,
 %!   +Context:ordset(pair(iri,integer)),
 %!   +CausalFormula:compound,
-%!   ?Cause:ordset(iri)
+%!   ?Cause:ordset(iri),
+%!   -CausalPath:ordset(iri)
 %! ) is nondet.
 
-models0(M, Us, Phi, Xs):-
+models0(M, Us, Phi, Xs, Zs):-
   % Collect all endogenous variables.
   endogenous_variables(M, Vs),
 
@@ -184,7 +178,7 @@ models0(M, Us, Phi, Xs):-
 assign_variables([], []).
 assign_variables([Var|T1], [Var-Val|T2]):-
   % NONDET.
-  rdf_typed_literal(Var, aco:possible_value, Val, xsd:integer),
+  potential_value(Var, Val),
   assign_variables(T1, T2).
 
 
@@ -194,23 +188,17 @@ assign_variables([Var|T1], [Var-Val|T2]):-
 
 context(M, Us):-
   nonvar(Us), !,
-  context1(M, Us), !.
+  context0(M, Us), !.
 context(M, Us):-
-  context1(M, Us).
+  context0(M, Us).
 
-context1(M, Us):-
+context0(M, Us):-
   aggregate_all(
     set(Var),
     outer_variable(M, Var),
     Vars
   ),
-  context2(Vars, Us).
-
-context2([], []).
-context2([Var|T1], [Var-Val|T2]):-
-  % NONDET.
-  potential_value(Var, Val),
-  context2(T1, T2).
+  assign_variables(Vars, Us).
 
 
 

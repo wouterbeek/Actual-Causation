@@ -15,6 +15,7 @@
 :- use_module(library(clpfd)).
 
 :- use_module(ac(ac_build)).
+:- use_module(ac(ac_build_sim)).
 
 :- initialization(load_test_models).
 
@@ -25,8 +26,10 @@ load_test_models:-
      dropping a lit match.',
     [fire in 0..1, lightning in 0..1, match in 0..1],
     [fire #= max(lightning,match)],
-    fire-1
+    M1
   ),
+  assert_default_causal_formula(M1, fire-1),
+  
   %assert_model(
   %  trumping,
   %  'Suppose that a group of soldiers is very well trained, so that they \c
@@ -43,8 +46,10 @@ load_test_models:-
   %  ->  P #= 0
   %  ;   P #= 1
   %  ),
-  %  p-1
+  %  M2
   %),
+  %assert_default_causal_formula(M2, p-1),
+  
   assert_model(
     suzy_and_billy,
     'Suzy and Billy both pick up rocks and throw them at a bottle. \c
@@ -53,8 +58,10 @@ load_test_models:-
      the bottle had Suzy not thrown.',
     [bh in 0..1, bs in 0..1, bt in 0..1, sh in 0..1, st in 0..1],
     [bh #= min(bt,1-sh), sh #= st, bs #= max(bh,sh)],
-    bs-1
+    M3
   ),
+  assert_default_causal_formula(M3, bs-1),
+  
   assert_model(
     careless_camper,
     'Suppose that the Careless Camper (CC for short) has plans to go \c
@@ -65,5 +72,6 @@ load_test_models:-
      Let the variable C take the value 1 if CC goes camping, and 0 otherwise.',
     [cc in 0..1, f1 in 0..1, f2 in 0..1],
     [cc #= 1 - f1, f2 #= cc * (1 - f1)],
-    f2-1
-  ).
+    M4
+  ),
+  assert_default_causal_formula(M4, f2-1).

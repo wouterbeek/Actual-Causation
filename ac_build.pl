@@ -1,16 +1,14 @@
 :- module(
   ac_build_model,
   [
+    assert_model/4, % +Name:atom
+                    % +Description:atom
+                    % +Signature:list(pair(atom,list(integer))),
+                    % +StructuralEquations:list(compound)
     assert_model/5, % +Name:atom
                     % +Description:atom
                     % +Signature:list(pair(atom,list(integer))),
                     % +StructuralEquations:list(compound)
-                    % +Phi:compound
-    assert_model/6, % +Name:atom
-                    % +Description:atom
-                    % +Signature:list(pair(atom,list(integer))),
-                    % +StructuralEquations:list(compound)
-                    % +Phi:compound
                     % -Model:iri
     assign_value/1, % +Assignment:pair(iri,integer)
     run_with_assigned_values/2 % +Assignment:list(pair(iri,integer))
@@ -51,23 +49,21 @@
 %!   +Name:atom,
 %!   +Description:atom,
 %!   +Signature:list(pair(atom,list(integer))),
-%!   +StructuralEquations:list(compound),
-%!   +Phi:compound
+%!   +StructuralEquations:list(compound)
 %! ) is det.
 
-assert_model(Name, Description, Signature, StructuralEquations, Phi):-
-  assert_model(Name, Description, Signature, StructuralEquations, Phi, _).
+assert_model(Name, Description, Signature, StructuralEquations):-
+  assert_model(Name, Description, Signature, StructuralEquations, _).
 
 %! assert_model(
 %!   +Name:atom,
 %!   +Description:atom,
 %!   +Signature:list(pair(atom,list(integer))),
 %!   +StructuralEquations:list(compound),
-%!   +Phi:compound,
 %!   -Model:iri
 %! ) is det.
 
-assert_model(Name, Description, Signature, StructuralEquations, Phi, M):-
+assert_model(Name, Description, Signature, StructuralEquations, M):-
   % aco:Model
   rdf_create_next_resource(ac, [model], aco:'Model', ac, M),
 
@@ -84,11 +80,7 @@ assert_model(Name, Description, Signature, StructuralEquations, Phi, M):-
 
   % aco:structural_equation
   % aco:causes
-  maplist(assert_structural_equation(M), StructuralEquations),
-  
-  % aco:causal_formula
-  with_output_to(atom(Phi0), write_canonical(Phi)),
-  rdf_assert_simple_literal(M, aco:causal_formula, Phi0, ac).
+  maplist(assert_structural_equation(M), StructuralEquations).
 
 
 
@@ -147,6 +139,7 @@ assert_structural_equation(M, Eq):-
 assign_value(Var-Val):-
   rdf_retractall(Var, aco:value, _),
   rdf_assert_typed_literal(Var, aco:value, Val, xsd:integer, ac).
+
 
 
 %! run_with_assigned_values(+Assignment:list(pair(iri,integer)), :Goal) .
