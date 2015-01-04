@@ -35,6 +35,8 @@
 :- use_module(ac(ac_export)).
 :- use_module(ac(ac_models)).
 :- use_module(ac(ac_read)).
+:- use_module(ac(ac_read_sim)).
+:- use_module(ac(ac_trans)).
 
 :- http_handler(ac(cli/model), cli_model, [prefix]).
 :- http_handler(ac(cli/simulate), cli_simulate, [prefix]).
@@ -64,7 +66,26 @@ cli_simulate(Request):-
   reply_html_page(
     menu_page,
     [title('Actual-Causation CLI :: Simulate :: ',MLabel)],
-    [\description(M),\causal_graph(M),\signature(M),\causes(M)]
+    [
+      \description(M),
+      \causal_graph(M),
+      \signature(M),
+      \causes(M)
+    ]
+  ).
+cli_simulate(Request):-
+  request_query_nvpair(Request, models, Models), !,
+  rdf_has(M, aco:models, Models),
+  once(rdfs_label_value(M, MLabel)),
+  reply_html_page(
+    menu_page,
+    [title('Actual-Causation CLI :: Simulate :: ',MLabel)],
+    [
+      \description(M),
+      \causal_path(Models),
+      \signature(M),
+      \causes(M)
+    ]
   ).
 cli_simulate(_):-
   reply_html_page(
@@ -79,8 +100,18 @@ cli_simulate(_):-
 
 % GRAMMAR %
 
-assignment_entry(Var-Val) -->
+primitive_event(Var-Val) -->
   html([\var(Var),=,\val(Val)]).
+
+causal_formula(and(Phi,Psi)) --> !,
+  causal_formula(Phi),
+  html(&(8743)),
+  causal_formula(Psi).
+causal_formula(not(Phi)) --> !,
+  html(&(172)),
+  causal_formula(Phi).
+causal_formula(PrimitiveEvent) -->
+  primitive_event(PrimitiveEvent).
 
 causal_graph(M) -->
   {
@@ -92,21 +123,52 @@ causal_graph(M) -->
     \xml_dom_as_atom(Svg)
   ]).
 
+causal_path(Models) -->
+  {
+    causal_path(Models, ExportG),
+    export_graph_to_svg_dom(ExportG, Svg, [method(dot)])
+  },
+  html([
+    h2('Causal path through causal graph'),
+    \xml_dom_as_atom(Svg)
+  ]).
+
 causes(M) -->
   {
+    rdf_simple_literal(M, aco:default_causal_formula, Phi_atom),
+    read_term_from_atom(Phi_atom, Phi_term, []),
+    instantiate_term(M, var, Phi_term, Phi),
+    
     aggregate_all(
-      set([assignment(Us),vars(Xs),vars(Zs)]),
-      models(M, Us, _, Xs, Zs),
+      set([assignment(Us),vars(Xs),vars(Zs),uri(Location,'$@$')]),
+      (
+        models0(M, Us, Phi_atom, Xs, Zs, Models),
+        http_location_by_id(cli_simulate, Base),
+        uri_query_add_nvpair(Base, models, Models, Location)
+      ),
       DataRows
     )
   },
   html(
     \html_table(
-      html(['Contexts & Causes of model ',\rdf_term_html(plTabular, M)]),
+      html([
+        'Contexts & Causes of ',
+        \rdf_term_html(plTabular, M),
+        &(8871),
+        \causal_formula(Phi)
+      ]),
       html_ac,
-      [['Contexts','Cause','Causal path']|DataRows],
+      [['Contexts','Cause','Causal path','Focus']|DataRows],
       [header_row(true),indexed(true)]
     )
+  ).
+
+models0(M, Us, Phi, Xs, Zs, Models):-
+  (   \+ models(M, Us, Phi, Xs, Zs, Models)
+  ->  % NONDET.
+      calculate_models(M, Us, Phi, Xs, Zs, Models)
+  ;   % NONDET.
+      models(M, Us, Phi, Xs, Zs, Models)
   ).
 
 description(M) -->
@@ -115,7 +177,7 @@ description(M) -->
 description(_) --> html([]).
 
 html_ac(assignment(L)) --> !,
-  html_set(assignment_entry, L).
+  html_set(primitive_event, L).
 html_ac(vars(L)) --> !,
   html_set(var, L).
 html_ac(Term) -->

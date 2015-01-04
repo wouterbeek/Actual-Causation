@@ -1,9 +1,14 @@
 :- module(
   ac_read_sim,
   [
-    assignment_entry/2, % ?AssignmentEntry:iri
-                        % ?AssignmentEntryPl:pair(iri,integer)
-    models/5
+    models/6, % ?Model:iri
+              % ?Context:ordset(pair(iri,integer))
+              % ?CausalFormula:compound
+              % ?Cause:ordset(iri)
+              % ?CausalPath:ordset(iri)
+              % ?Models:iri
+    primitive_event/2 % ?AssignmentEntryPl:pair(iri,integer)
+                      % ?AssignmentEntry:iri
   ]
 ).
 
@@ -28,52 +33,48 @@ Simulation results stored in RDF.
 
 
 
-%! assignment(
-%!   ?Assignment:iri,
-%!   ?AssignmentPl:ordset(pair(iri,integer))
-%! ) is nondet.
+%! context(?ContextPl:ordset(pair(iri,integer)), ?Context:iri) is nondet.
 
-assignment(Assignment, As):-
-  rdfs_individual_of(Assignment, aco:'Assignment'),
-  rdf_list(Assignment, Entries),
-  maplist(assignment_entry, Entries, As).
+context(Us, Context):-
+  rdfs_individual_of(Context, aco:'Context'),
+  rdf_list(Context, PrimitiveEvents),
+  maplist(primitive_event, Us, PrimitiveEvents).
 
 
 
-%! assignment_entry(
-%!   ?AssignmentEntry:iri,
-%!   ?AssignmentEntryPl:pair(iri,integer)
-%! ) is nondet.
-
-assignment_entry(Entry, Var-Val):-
-  rdfs_individual_of(Entry, aco:'AssignmentEntry'),
-  rdf(Entry, aco:entry_variable, Var, ac),
-  rdf_typed_literal(Entry, aco:entry_value, Val, xsd:integer, ac).
-
-
-
-
-models(M, Us, Phi, Xs, Zs):-
+models(M, Us, Phi, Xs, Zs, Models):-
   % rdf:type
   % aco:Models
   rdfs_individual_of(Models, aco:'Models'),
-  
+
   % aco:model
-  rdf(M, aco:model, Models, ac),
-  
+  rdf(M, aco:models, Models, ac),
+
   % aco:causal_formula
   rdf_simple_literal(Models, aco:causal_formula, Phi_atom),
   read_term_from_atom(Phi_atom, Phi_term, []),
   instantiate_term(M, var, Phi_term, Phi),
-  
+
   % aco:context
   rdf(Models, aco:context, Context, ac),
-  assignment(Context, Us),
-  
+  context(Us, Context),
+
   % aco:cause
   rdf(Models, aco:cause, Cause, ac),
   rdf_list(Cause, Xs),
-  
+
   % aco:causal_path
   rdf(Models, aco:causal_path, CausalPath, ac),
   rdf_list(CausalPath, Zs).
+
+
+
+%! primitive_event(
+%!   ?AssignmentEntryPl:pair(iri,integer),
+%!   ?AssignmentEntry:iri
+%! ) is nondet.
+
+primitive_event(Var-Val, Entry):-
+  rdfs_individual_of(Entry, aco:'AssignmentEntry'),
+  rdf(Entry, aco:entry_variable, Var, ac),
+  rdf_typed_literal(Entry, aco:entry_value, Val, xsd:integer, ac).

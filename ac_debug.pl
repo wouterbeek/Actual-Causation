@@ -43,17 +43,17 @@ assignment(As) -->
 
 assignment0([]) --> "".
 assignment0([A1]) --> !,
-  assignment_entry(A1).
+  primitive_event(A1).
 assignment0([A1,A2|As]) -->
-  assignment_entry(A1),
+  primitive_event(A1),
   ",",
   assignment0([A2|As]).
 
 
 
-%! assignment_entry(+AssignmentEntry:pair(iri,integer))// is det.
+%! primitive_event(+AssignmentEntry:pair(iri,integer))// is det.
 
-assignment_entry(Var-Val) -->
+primitive_event(Var-Val) -->
   {rdfs_label_value(Var, VarLabel)},
   atom(VarLabel),
   code_radix(hex('2190')),

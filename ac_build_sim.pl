@@ -3,11 +3,12 @@
   [
     assert_default_causal_formula/2, % +Model:iri
                                      % +CausalFormula:compound
-    assert_models/5 % +Model:iri
+    assert_models/6 % +Model:iri
                     % +Context:ordset(pair(iri,integer))
                     % +CausalFormula:compound
                     % +Cause:ordset(iri)
                     % +CausalPath:ordset(iri)
+                    % -Models:iri
   ]
 ).
 
@@ -28,6 +29,7 @@ Simulation results stored in RDF.
 :- use_module(ac(ac_read_sim)).
 
 :- rdf_meta(assert_assignment0(+,r,+,-)).
+:- rdf_meta(assert_vars0(+,r,+,-)).
 
 
 
@@ -66,12 +68,13 @@ assert_default_causal_formula(M, Phi):-
 %!   +Context:ordset(pair(iri,integer)),
 %!   +Phi:compound,
 %!   +Cause:ordset(iri),
-%!   +CausalPath:ordset(iri)
+%!   +CausalPath:ordset(iri),
+%!   -Models:iri
 %! ) is det.
 
-assert_models(M, Us, Phi, Xs, Zs):-
-  models(M, Us, Phi, Xs, Zs), !.
-assert_models(M, Us, Phi, Xs, Zs):-
+assert_models(M, Us, Phi, Xs, Zs, Models):-
+  models(M, Us, Phi, Xs, Zs, Models), !.
+assert_models(M, Us, Phi, Xs, Zs, Models):-
   rdf_create_next_resource(ac, [models], aco:'Models', ac, Models),
   rdf_assert(M, aco:models, Models, ac),
   assert_context(Models, Us),
@@ -118,11 +121,11 @@ assert_assignment0(SubPaths, Class, As, Assignment):-
 %! ) is det.
 
 assert_assignment_entry(Var-Val, Entry):-
-  assignment_entry(Var-Val, Entry), !.
+  primitive_event(Var-Val, Entry), !.
 assert_assignment_entry(Var-Val, Entry):-
   rdf_create_next_resource(
     ac,
-    [assignment_entry],
+    [primitive_event],
     aco:'AssignmentEntry',
     ac,
     Entry

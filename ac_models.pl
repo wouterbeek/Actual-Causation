@@ -1,11 +1,11 @@
 :- module(
   ac_models,
   [
-    models/5 % +Model:iri
-             % ?Context:ordset(pair(iri,integer))
-             % +CausalFormula:compound
-             % ?Cause:ordset(pair(iri,integer))
-             % -CausalPath:ordset(iri)
+    calculate_models/6 % +Model:iri
+                       % ?Context:ordset(pair(iri,integer))
+                       % +CausalFormula:atom
+                       % ?Cause:ordset(pair(iri,integer))
+                       % -CausalPath:ordset(iri)
   ]
 ).
 
@@ -36,47 +36,46 @@
 :- use_module(ac(ac_calc)).
 :- use_module(ac(ac_debug)).
 :- use_module(ac(ac_read)).
+:- use_module(ac(ac_trans)).
 
-:- dynamic(cause0/3).
-
-
-
+:- dynamic(cause0/4).
 
 
-%! models(
+
+
+
+%! calculate_models(
 %!   +Model:iri,
 %!   ?Context:ordset(pair(iri,integer)),
-%!   +CausalFormula:compound,
+%!   +CausalFormula:atom,
 %!   ?Cause:ordset(iri),
 %!   -CausalPath:ordset(iri)
 %! ) is nondet.
 
-models(M, Us, Phi, Xs, Zs):-
-  (   var(Phi)
-  ->  causal_formula(M, Phi)
-  ;   true
-  ),
-
+calculate_models(M, Us, Phi_atom, Xs, Zs, Models):-
   % NONDET.
   context(M, Us),
 
   % Reset cause memoization on a per-context basis.
-  retractall(cause0(M, Us, _)),
+  retractall(cause0(M, Us, Phi_atom, _)),
 
   % Set the context in the current database snapshot.
-  run_with_assigned_values(Us, models0(M, Us, Phi, Xs, Zs)),
+  read_term_from_atom(Phi_atom, Phi_term, []),
+  instantiate_term(M, var, Phi_term, Phi),
+  run_with_assigned_values(Us, calculate_models0(M, Us, Phi, Xs, Zs)),
 
   % Store this result to ensure minimality of future results.
-  assert(cause0(M, Us, Xs)).
+  assert(cause0(M, Us, Phi_atom, Xs)),
+  assert_models(M, Us, Phi_term, Xs, Zs, Models).
 
-%! models0(
+%! calculate_models0(
 %!   +Model:iri,
 %!   +Context:ordset(pair(iri,integer)),
 %!   +CausalFormula:compound,
 %!   +Cause:ordset(iri),
 %!   -CausalPath:ordset(iri)
 %! ) is semidet.
-%! models0(
+%! calculate_models0(
 %!   +Model:iri,
 %!   +Context:ordset(pair(iri,integer)),
 %!   +CausalFormula:compound,
@@ -84,7 +83,7 @@ models(M, Us, Phi, Xs, Zs):-
 %!   -CausalPath:ordset(iri)
 %! ) is nondet.
 
-models0(M, Us, Phi, Xs, Zs):-
+calculate_models0(M, Us, Phi, Xs, Zs):-
   % Collect all endogenous variables.
   endogenous_variables(M, Vs),
 
@@ -122,7 +121,7 @@ models0(M, Us, Phi, Xs, Zs):-
   % (condition 3: minimality).
   % Notice that smaller causes are considered first.
   \+ ((
-    cause0(M, Us, Xs0),
+    cause0(M, Us, Phi, Xs0),
     subset(Xs0, Xs)
   )),
 

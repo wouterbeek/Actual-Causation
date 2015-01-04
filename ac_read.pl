@@ -3,8 +3,6 @@
   [
     actual_value/2, % +Variable:iri
                     % ?Value:integer
-    causal_formula/2, % +Model:iri
-                      % -CausalFormula:compound
     determine_value/3, % +Model:iri
                        % +Variable:iri
                        % -Value:integer
@@ -46,15 +44,6 @@
 
 actual_value(Var, Val):-
   once(rdf_typed_literal(Var, aco:value, Val, xsd:integer)).
-
-
-
-%! causal_formula(+Model:iri, -CausalFormula:compound) is det.
-
-causal_formula(M, Phi):-
-  rdf_simple_literal(M, aco:default_causal_formula, Phi_atom),
-  read_term_from_atom(Phi_atom, Phi_term, []),
-  instantiate_term(M, var, Phi_term, Phi).
 
 
 

@@ -1,8 +1,10 @@
 :- module(
   ac_export,
   [
-    causal_graph/2 % +Model:iri
-                   % -ExportGraph:compound
+    causal_graph/2, % +Model:iri
+                    % -ExportGraph:compound
+    causal_path/2 % +Models:iri
+                  % -ExportGraph:compound
   ]
 ).
 
@@ -26,6 +28,8 @@ Export graphs of actual causality.
 
 :- use_module(plRdf(api/rdfs_read)).
 
+:- use_module(ac(ac_read_sim)).
+
 :- rdf_meta(ac_vertex_label(r,-)).
 :- rdf_meta(exogenous_edge(+,t)).
 
@@ -33,7 +37,45 @@ Export graphs of actual causality.
 
 
 
+%! causal_graph(+Model:iri, -ExportGraph:compound) is det.
+
 causal_graph(M, ExportG):-
+  causal_vertices_edges(M, Vs, Es),
+  build_export_graph(
+    Vs,
+    Es,
+    ExportG,
+    [
+      graph_directed(true),
+      vertex_label(ac_vertex_label)
+    ]
+  ).
+
+
+
+%! causal_path(+Models:iri, -ExportGraph:compound) is det.
+
+causal_path(Models, ExportG):-
+  once(models(M, _, _, Xs, Zs, Models)),
+  causal_vertices_edges(M, Vs, Es),
+  build_export_graph(
+    Vs,
+    Es,
+    ExportG,
+    [
+      graph_directed(true),
+      vertex_color(ac_vertex_color(Xs, Zs)),
+      vertex_label(ac_vertex_label)
+    ]
+  ).
+
+
+
+
+
+% HELPERS %
+
+causal_vertices_edges(M, Vs, Es):-
   % 1: Endogenous edges.
   aggregate_all(
     set(edge(X,_,Y)),
@@ -43,7 +85,7 @@ causal_graph(M, ExportG):-
     ),
     EndogenousEs
   ),
-  
+
   % 2: Exogenous edges.
   % Take the *set* here, because an outer node may link to multiple
   % (non-outer) nodes.
@@ -56,22 +98,33 @@ causal_graph(M, ExportG):-
     Outers
   ),
   maplist(exogenous_edge, Outers, ExogenousEs),
-  
+
   % Edges -> vertices.
   ord_union(EndogenousEs, ExogenousEs, Es),
-  l_edges_vertices(Es, Vs),
-  
-  build_export_graph(
-    Vs,
-    Es,
-    ExportG,
-    [
-      graph_directed(true),
-      vertex_label(ac_vertex_label)
-    ]
-  ).
+  l_edges_vertices(Es, Vs).
+
+
 
 exogenous_edge(X, edge(aco:exogenous,_,X)).
+
+
+
+%! ac_vertex_color(
+%!   +Cause:ordset(iri),
+%!   +CausalPath:ordset(iri),
+%!   +Vertex:iri,
+%!   -Color:atom
+%! ) is det.
+
+ac_vertex_color(Xs, _, V, red):-
+  memberchk(V, Xs), !.
+ac_vertex_color(_, Zs, V, green):-
+  memberchk(V, Zs), !.
+ac_vertex_color(_, _, _, black).
+
+
+
+%! ac_vertex_label(+Vertex:iri, -Label:atom) is det.
 
 ac_vertex_label(aco:exogenous, 'Exogenous'):- !.
 ac_vertex_label(V, VLabel):-
