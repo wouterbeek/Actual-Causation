@@ -1,8 +1,10 @@
 :- module(
   ac_read,
   [
+    actual_value/2, % +Variable:iri
+                    % ?Value:integer
     causal_formula/2, % +Model:iri
-                      % -CausalFormula:list(pair(iri,integer))
+                      % -CausalFormula:compound
     determine_value/3, % +Model:iri
                        % +Variable:iri
                        % -Value:integer
@@ -12,8 +14,8 @@
                             % -Endogenous:ordset(iri)
     outer_variable/2, % +Model:iri
                       % -Variable:iri
-    value/2, % +Variable:iri
-             % ?Value:integer
+    potential_value/2, % +Variable:iri
+                       % ?Value:integer
     variable/3 % +Model:iri
                % +Name:atom
                % -Variable:iri
@@ -29,7 +31,6 @@
 :- use_module(library(aggregate)).
 :- use_module(library(apply)).
 :- use_module(library(semweb/rdf_db), except([rdf_node/1])).
-:- use_module(library(semweb/rdfs)).
 
 :- use_module(plRdf(api/rdf_read)).
 :- use_module(plRdf(api/rdfs_read)).
@@ -38,17 +39,20 @@
 
 
 
-%! causal_formula(+Model:iri, -CausalFormula:list(pair(iri,integer))) is det.
+%! actual_value(+Variable:iri, +Value:integer) is semidet.
+%! actual_value(+Variable:iri, -Value:integer) is semidet.
 
-causal_formula(Model, Pairs):-
-  aggregate_all(
-    set(Var-Val),
-    (
-      rdf_has(Model, aco:endogenous_variable, Var),
-      rdf_typed_literal(Var, aco:causal_formula, Val, xsd:integer, _)
-    ),
-    Pairs
-  ).
+actual_value(Var, Val):-
+  once(rdf_typed_literal(Var, aco:value, Val, xsd:integer)).
+
+
+
+%! causal_formula(+Model:iri, -CausalFormula:compound) is det.
+
+causal_formula(M, Phi):-
+  rdf_simple_literal(M, aco:causal_formula, Phi_atom),
+  read_term_from_atom(Phi_atom, Phi_term, []),
+  instantiate_term(M, var, Phi_term, Phi).
 
 
 
@@ -56,12 +60,12 @@ causal_formula(Model, Pairs):-
 % Succeeds for the determined value of the given variable.
 
 determine_value(_, Var, Val):-
-  rdf_typed_literal(Var, aco:value, Val, xsd:integer), !.
+	actual_value(Var, Val), !.
 determine_value(M, Var, Val):-
   rdf_simple_literal(Var, aco:structural_equation, Eq0),
   read_term_from_atom(Eq0, Eq, []),
   Eq = #=(_,Right0),
-  instantiate_term(M, Right0, Right),
+  instantiate_term(M, val, Right0, Right),
   Val is Right.
 
 
@@ -103,11 +107,14 @@ outer_variable(M, Var):-
 
 
 
-%! value(+Variable:iri, +Value:integer) is semidet.
-%! value(+Variable:iri, -Value:integer) is semidet.
+%! potential_value(+Variable:iri, +Value:integer) is semidet.
+%! potential_value(+Variable:iri, -Value:integer) is multi.
 
-value(Var, Val):-
-  once(rdf_has(Var, aco:value, Val)).
+potential_value(Var, Val):-
+  once(rdf_has(Var, aco:range, Range)),
+  rdf_typed_literal(Range, aco:low, Low, xsd:integer),
+  rdf_typed_literal(Range, aco:high, High, xsd:integer),
+  between(Low, High, Val).
 
 
 
@@ -123,13 +130,21 @@ variable(M, Name, Var):-
 
 % HELPERS %
 
-%! instantiate_term(+Module:iri, +Term, -InstantiatedTerm) is det.
+%! instantiate_term(
+%!   +Module:iri,
+%!   +Mode:oneof([val,var]),
+%!   +Term:compound,
+%!   -InstantiatedTerm:compound
+%! ) is det.
 
-instantiate_term(M, Name, Val):-
+instantiate_term(M, Mode, Name, X):-
   atom(Name), !,
   variable(M, Name, Var),
-  rdf_typed_literal(Var, aco:value, Val, xsd:integer, _).
-instantiate_term(M, Expr1, Expr2):-
+  (   Mode == val
+  ->  rdf_typed_literal(Var, aco:value, X, xsd:integer)
+  ;   X = Var
+  ).
+instantiate_term(M, Mode, Expr1, Expr2):-
   Expr1 =.. [Pred|Args1],
-  maplist(instantiate_term(M), Args1, Args2),
+  maplist(instantiate_term(M, Mode), Args1, Args2),
   Expr2 =.. [Pred|Args2].

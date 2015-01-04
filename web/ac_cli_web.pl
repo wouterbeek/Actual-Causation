@@ -29,6 +29,9 @@
 :- use_module(plRdf(api/rdf_read)).
 :- use_module(plRdf(api/rdfs_read)).
 
+:- use_module(plTabular(rdf_html_table)).
+:- use_module(plTabular(rdf_term_html)).
+
 :- use_module(ac(ac_export)).
 :- use_module(ac(ac_models)).
 :- use_module(ac(ac_read)).
@@ -46,7 +49,7 @@ cli_model(Request):-
   reply_html_page(
     menu_page,
     [title(['Actual-Causation CLI :: Model :: ',MLabel])],
-    [\description(M),\causal_graph(M)]
+    [\description(M),\causal_graph(M),\signature(M)]
   ).
 cli_model(_):-
   reply_html_page(
@@ -61,7 +64,7 @@ cli_simulate(Request):-
   reply_html_page(
     menu_page,
     [title('Actual-Causation CLI :: Simulate :: ',MLabel)],
-    [\description(M),\causal_graph(M),\causes(M)]
+    [\description(M),\causal_graph(M),\signature(M),\causes(M)]
   ).
 cli_simulate(_):-
   reply_html_page(
@@ -85,35 +88,31 @@ causal_graph(M) -->
     export_graph_to_svg_dom(ExportG, Svg, [method(dot)])
   },
   html([
-    h1('Causal graph'),
+    h2('Causal graph'),
     \xml_dom_as_atom(Svg)
   ]).
 
 causes(M) -->
   {
-    %variable(M, match, VarM),
-    %variable(M, lightning, VarL),
-    %Us = [VarL-1,VarM-1],
-    variable(M, fire, VarF),
+gtrace,
     aggregate_all(
       set([assignment(Us),vars(Xs)]),
-      models(M, Us, VarF-1, Xs),
+      models(M, Us, _, Xs),
       DataRows
     )
   },
-  html([
-    h1('Contexts & Causes'),
+  html(
     \html_table(
-      html('Contexts & Causes'),
+      html(['Contexts & Causes of model ',\rdf_term_html(plTabular, M)]),
       html_ac,
       [['Contexts','Cause']|DataRows],
       [header_row(true),indexed(true)]
     )
-  ]).
+  ).
 
 description(M) -->
-  {rdf_plain_literal(M, dcterms:description, Description, _)}, !,
-  html([h1('Description'),p(Description)]).
+  {rdf_simple_literal(M, dcterms:description, Description, _)}, !,
+  html([h2('Description'),p(Description)]).
 description(_) --> html([]).
 
 html_ac(assignment(L)) --> !,
@@ -137,6 +136,26 @@ list_models(HandlerId) -->
     )
   },
   html_list(Links).
+
+signature(M) -->
+  {
+    aggregate_all(
+      set([Var,Low,High]),
+      (
+        rdf_has(M, aco:endogenous_variable, Var),
+        rdf_has(Var, aco:range, Range),
+        rdf_typed_literal(Range, aco:low, Low, xsd:integer),
+        rdf_typed_literal(Range, aco:high, High, xsd:integer)
+      ),
+      DataRows
+    ),
+    HeaderRow = ['Variable','Low','High']
+  },
+  rdf_html_table(
+    html(['Signature of model ',\rdf_term_html(plTabular, M)]),
+    [HeaderRow|DataRows],
+    [graph(ac),header_row(true),indexed(true),location(plTabular)]
+  ).
 
 val(Val) -->
   html(span(class=val,\html_pl_term(integer(Val)))).

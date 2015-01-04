@@ -1,14 +1,16 @@
 :- module(
   ac_build_model,
   [
-    assert_model/4, % +Name:atom
-                    % +Description:atom
-                    % +Signature:list(pair(atom,list(integer))),
-                    % +StructuralEquations:list(compound)
     assert_model/5, % +Name:atom
                     % +Description:atom
                     % +Signature:list(pair(atom,list(integer))),
                     % +StructuralEquations:list(compound)
+                    % +Phi:compound
+    assert_model/6, % +Name:atom
+                    % +Description:atom
+                    % +Signature:list(pair(atom,list(integer))),
+                    % +StructuralEquations:list(compound)
+                    % +Phi:compound
                     % -Model:iri
     assign_value/1, % +Assignment:pair(iri,integer)
     run_with_assigned_values/2 % +Assignment:list(pair(iri,integer))
@@ -49,21 +51,23 @@
 %!   +Name:atom,
 %!   +Description:atom,
 %!   +Signature:list(pair(atom,list(integer))),
-%!   +StructuralEquations:list(compound)
+%!   +StructuralEquations:list(compound),
+%!   +Phi:compound
 %! ) is det.
 
-assert_model(Name, Description, Signature, StructuralEquations):-
-  assert_model(Name, Description, Signature, StructuralEquations, _).
+assert_model(Name, Description, Signature, StructuralEquations, Phi):-
+  assert_model(Name, Description, Signature, StructuralEquations, Phi, _).
 
 %! assert_model(
 %!   +Name:atom,
 %!   +Description:atom,
 %!   +Signature:list(pair(atom,list(integer))),
 %!   +StructuralEquations:list(compound),
+%!   +Phi:compound,
 %!   -Model:iri
 %! ) is det.
 
-assert_model(Name, Description, Signature, StructuralEquations, M):-
+assert_model(Name, Description, Signature, StructuralEquations, Phi, M):-
   % aco:Model
   rdf_create_next_resource(ac, [model], aco:'Model', ac, M),
 
@@ -71,7 +75,7 @@ assert_model(Name, Description, Signature, StructuralEquations, M):-
   rdfs_assert_label(M, Name, ac),
 
   % dcterms:description
-  rdf_assert_plain_literal(M, dcterms:description, Description, ac),
+  rdf_assert_simple_literal(M, dcterms:description, Description, ac),
 
   % aco:EndogenousVariable
   % aco:endogenous_variable
@@ -80,7 +84,11 @@ assert_model(Name, Description, Signature, StructuralEquations, M):-
 
   % aco:structural_equation
   % aco:causes
-  maplist(assert_structural_equation(M), StructuralEquations).
+  maplist(assert_structural_equation(M), StructuralEquations),
+  
+  % aco:causal_formula
+  with_output_to(atom(Phi0), write_canonical(Phi)),
+  rdf_assert_simple_literal(M, aco:causal_formula, Phi0, ac).
 
 
 
@@ -89,7 +97,7 @@ assert_model(Name, Description, Signature, StructuralEquations, M):-
 %!   +SignatureEntry:pair(atom,list(integer))
 %! ) is det.
 
-assert_signature(M, Name-Vals):-
+assert_signature(M, in(Name,Range0)):-
   % aco:EndogenousVariable
   % rdf:type
   rdf_create_next_resource(
@@ -107,16 +115,11 @@ assert_signature(M, Name-Vals):-
   rdfs_assert_label(Var, Name, ac),
 
   % aco:possible_value
-  maplist(
-    \Val^rdf_assert_typed_literal(
-      Var,
-      aco:possible_value,
-      Val,
-      xsd:integer,
-      ac
-    ),
-    Vals
-  ).
+  Range0 = Low..High,
+  rdf_bnode(Range),
+  rdf_assert(Var, aco:range, Range, ac),
+  rdf_assert_typed_literal(Range, aco:low, Low, xsd:integer, ac),
+  rdf_assert_typed_literal(Range, aco:high, High, xsd:integer, ac).
 
 
 

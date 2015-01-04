@@ -3,7 +3,7 @@
   [
     models/4 % +Model:iri
              % ?Context:ordset(pair(iri,integer))
-             % +CausalFormula:compound
+             % ?CausalFormula:compound
              % ?Cause:ordset(pair(iri,integer))
   ]
 ).
@@ -45,13 +45,13 @@
 %! models(
 %!   +Model:iri,
 %!   +Context:ordset(pair(iri,integer)),
-%!   +CausalFormula:compound,
+%!   ?CausalFormula:compound,
 %!   +Cause:ordset(iri)
 %! ) is semidet.
 %! models(
 %!   +Model:iri,
 %!   ?Context:ordset(pair(iri,integer)),
-%!   +CausalFormula:compound,
+%!   ?CausalFormula:compound,
 %!   ?Cause:ordset(iri)
 %! ) is nondet.
 %
@@ -60,15 +60,20 @@
 % @arg Cause The variables that make up the cause.
 
 models(M, Us, Phi, Xs):-
+  (   var(Phi)
+  ->  causal_formula(M, Phi)
+  ;   true
+  ),
+
   % NONDET.
   context(M, Us),
-  
+
   % Reset cause memoization on a per-context basis.
   retractall(cause0(M, Us, _)),
-  
+
   % Set the context in the current database snapshot.
   run_with_assigned_values(Us, models0(M, Us, Phi, Xs)),
-  
+
   % Store this result to ensure minimality of future results.
   assert(cause0(M, Us, Xs)).
 
@@ -149,7 +154,7 @@ models0(M, Us, Phi, Xs):-
   ord_union(AXs_contingent, AWs_contingent, Contingency1),
   satisfy_formula(M, Contingency1, not(Phi)),
   debug_models(M, Us, Contingency1, not(Phi)), % DEB
-  
+
   % 2B:
   ord_subtract(Zs, Xs, ZsMinusXs),
   forall(
@@ -203,7 +208,8 @@ context1(M, Us):-
 
 context2([], []).
 context2([Var|T1], [Var-Val|T2]):-
-  rdf_typed_literal(Var, aco:possible_value, Val, xsd:integer),
+  % NONDET.
+  potential_value(Var, Val),
   context2(T1, T2).
 
 
