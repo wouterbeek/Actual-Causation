@@ -61,13 +61,24 @@ calculate_models(M, Us, Phi_atom, Xs, Zs, Models):-
 
   % Reset cause memoization on a per-context basis.
   retractall(cause0(M, Us, Phi, _)),
+  
+  rdf_transaction(
+    forall(
+      % Set the context in the current database snapshot.
+      calculate_models(M, Us, Phi, Xs, Zs),
+      (
+        % Store this result to ensure minimality of future results.
+        assert(cause0(M, Us, Phi, Xs)),
+        assert_models(M, Us, Phi_term, Xs, Zs, Models)
+      )
+    ),
+    _,
+    [snapshot(true)]
+  ).
 
-  % Set the context in the current database snapshot.
-  run_with_assigned_values(Us, calculate_models0(M, Us, Phi, Xs, Zs)),
-
-  % Store this result to ensure minimality of future results.
-  assert(cause0(M, Us, Phi, Xs)),
-  assert_models(M, Us, Phi_term, Xs, Zs, Models).
+calculate_models(M, Us, Phi, Xs, Zs):-
+  maplist(assign_value, Us),
+  calculate_models0(M, Us, Phi, Xs, Zs).
 
 %! calculate_models0(
 %!   +Model:iri,
