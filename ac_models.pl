@@ -76,26 +76,25 @@ calculate_models(M, Us, Phi_atom, Xs, Zs, Models):-
     [snapshot(true)]
   ).
 
-calculate_models(M, Us, Phi, Xs, Zs):-
-  maplist(assign_value, Us),
-  calculate_models0(M, Us, Phi, Xs, Zs).
-
-%! calculate_models0(
+%! calculate_models(
 %!   +Model:iri,
 %!   +Context:ordset(pair(iri,integer)),
 %!   +CausalFormula:compound,
 %!   +Cause:ordset(iri),
 %!   -CausalPath:ordset(iri)
 %! ) is semidet.
-%! calculate_models0(
+%! calculate_models(
 %!   +Model:iri,
 %!   +Context:ordset(pair(iri,integer)),
 %!   +CausalFormula:compound,
-%!   ?Cause:ordset(iri),
+%!   -Cause:ordset(iri),
 %!   -CausalPath:ordset(iri)
 %! ) is nondet.
 
-calculate_models0(M, Us, Phi, Xs, Zs):-
+calculate_models(M, Us, Phi, Xs, Zs):-
+  % Since we are now within an RDF transaction, we can assert the context.
+  maplist(assign_value, Us),
+  
   % The caused must be the case (Condition 1).
   satisfy_formula(M, [], Phi),
   debug_models(M, Us, [], Phi), % DEB
@@ -148,11 +147,10 @@ calculate_models0(M, Us, Phi, Xs, Zs):-
   % A cause must be non-empty.
   Xs \== [],
 
+  % NONDET (x2).
   % Construct a contingency under which the counterfactual
   % can be satisfied (Condition 2).
-  % NONDET.
   assign_variables(Xs, AXs_contingent),
-  % NONDET.
   assign_variables(Ws, AWs_contingent),
 
   % 2A:
