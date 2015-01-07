@@ -2,7 +2,7 @@
 
 
 % Debug tools can be loaded by using the `--debug` flag in the console.
-:- if(current_prolog_flag(argv, ['--debug'])).
+:- if(current_prolog_flag(argv, ['--debug'|_])).
   :- ensure_loaded(debug).
 :- else.
   :- ensure_loaded(load).
@@ -16,7 +16,7 @@
 :- use_module(plServer(app_server)).
 :- use_module(plServer(web_modules)). % Web module registration.
 
-:- start_app_server([]).
+:- start_app_server_clas.
 
 
 :- multifile(user:file_search_path/2).
@@ -50,3 +50,4 @@ user:current_html_style(menu_page).
 % plTabular
 :- use_module(plTabular(rdf_tabular)).
 user:web_module(plTabular, rdf_tabular).
+

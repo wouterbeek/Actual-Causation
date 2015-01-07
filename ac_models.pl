@@ -33,6 +33,7 @@
 :- use_module(plRdf(api/rdf_read)).
 
 :- use_module(ac(ac_build)).
+:- use_module(ac(ac_build_sim)).
 :- use_module(ac(ac_calc)).
 :- use_module(ac(ac_debug)).
 :- use_module(ac(ac_read)).
@@ -61,13 +62,15 @@ calculate_models(M, Us, Phi_atom, Xs, Zs, Models):-
 
   % Reset cause memoization on a per-context basis.
   retractall(cause0(M, Us, Phi, _)),
-
+%%%%TRANSATION
   % Set the context in the current database snapshot.
   run_with_assigned_values(Us, calculate_models0(M, Us, Phi, Xs, Zs)),
 
   % Store this result to ensure minimality of future results.
   assert(cause0(M, Us, Phi, Xs)),
   assert_models(M, Us, Phi_term, Xs, Zs, Models).
+%%%%TRANSACTION
+%%%%NORDF-STORE
 
 %! calculate_models0(
 %!   +Model:iri,
