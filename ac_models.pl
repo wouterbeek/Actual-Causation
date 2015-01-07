@@ -62,32 +62,40 @@ calculate_models(M, Us, Phi_atom, Xs, Zs, Models):-
 
   % Reset cause memoization on a per-context basis.
   retractall(cause0(M, Us, Phi, _)),
-%%%%TRANSATION
-  % Set the context in the current database snapshot.
-  run_with_assigned_values(Us, calculate_models0(M, Us, Phi, Xs, Zs)),
+  
+  rdf_transaction(
+    forall(
+      % Set the context in the current database snapshot.
+      calculate_models(M, Us, Phi, Xs, Zs),
+      (
+        % Store this result to ensure minimality of future results.
+        assert(cause0(M, Us, Phi, Xs)),
+        assert_models(M, Us, Phi_term, Xs, Zs, Models)
+      )
+    ),
+    _,
+    [snapshot(true)]
+  ).
 
-  % Store this result to ensure minimality of future results.
-  assert(cause0(M, Us, Phi, Xs)),
-  assert_models(M, Us, Phi_term, Xs, Zs, Models).
-%%%%TRANSACTION
-%%%%NORDF-STORE
-
-%! calculate_models0(
+%! calculate_models(
 %!   +Model:iri,
 %!   +Context:ordset(pair(iri,integer)),
 %!   +CausalFormula:compound,
 %!   +Cause:ordset(iri),
 %!   -CausalPath:ordset(iri)
 %! ) is semidet.
-%! calculate_models0(
+%! calculate_models(
 %!   +Model:iri,
 %!   +Context:ordset(pair(iri,integer)),
 %!   +CausalFormula:compound,
-%!   ?Cause:ordset(iri),
+%!   -Cause:ordset(iri),
 %!   -CausalPath:ordset(iri)
 %! ) is nondet.
 
-calculate_models0(M, Us, Phi, Xs, Zs):-
+calculate_models(M, Us, Phi, Xs, Zs):-
+  % Since we are now within an RDF transaction, we can assert the context.
+  maplist(assign_value, Us),
+  
   % The caused must be the case (Condition 1).
   satisfy_formula(M, [], Phi),
   debug_models(M, Us, [], Phi), % DEB
@@ -140,11 +148,10 @@ calculate_models0(M, Us, Phi, Xs, Zs):-
   % A cause must be non-empty.
   Xs \== [],
 
+  % NONDET (x2).
   % Construct a contingency under which the counterfactual
   % can be satisfied (Condition 2).
-  % NONDET.
   assign_variables(Xs, AXs_contingent),
-  % NONDET.
   assign_variables(Ws, AWs_contingent),
 
   % 2A:
