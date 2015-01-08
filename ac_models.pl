@@ -223,12 +223,3 @@ formula_to_variables(or(Phi,Psi), Vars):- !,
   maplist(formula_to_variables, [Phi,Psi], [Vars1,Vars2]),
   ord_union(Vars1, Vars2, Vars).
 formula_to_variables(Var-_, [Var]).
-
-
-
-%! list_conjunction(+List:list, -Conjunction:compound) is det.
-%! list_conjunction(-List:list, +Conjunction:compound) is det.
-
-list_conjunction([H], H).
-list_conjunction([H|T1], and(H,T2)):-
-  list_conjunction(T1, T2).
