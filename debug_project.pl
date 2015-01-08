@@ -12,12 +12,23 @@ Generic code for debugging a project:
   * Load all subdirectories and Prolog files contained in those directories.
 
 @author Wouter Beek
-@version 2014/12/10
+@version 2014/12/30
 */
 
 :- use_module(library(ansi_term)).
 :- use_module(library(apply)).
 :- use_module(library(pldoc)).
+:- use_module(library(portray_text)).
+
+:- set_prolog_flag(
+  answer_write_options,
+  [max_depth(100),portrayed(true),spacing(next_argument)]
+).
+:- set_prolog_flag(
+  debugger_write_options,
+  [max_depth(100),portrayed(true),spacing(next_argument)]
+).
+:- set_portray_text(ellipsis, 1000).
 
 :- dynamic(user:debug_mode).
 :- multifile(user:debug_mode).
@@ -50,6 +61,8 @@ do_not_load(File1):-
   file_name_extension(File3, pl, File2),
   do_not_load0(File3).
 
+do_not_load0(dcg_ascii).
+do_not_load0(dcg_unicode).
 do_not_load0(debug).
 do_not_load0(debug_project).
 do_not_load0(index).

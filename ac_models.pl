@@ -33,6 +33,7 @@
 :- use_module(plRdf(api/rdf_read)).
 
 :- use_module(ac(ac_build)).
+:- use_module(ac(ac_build_sim)).
 :- use_module(ac(ac_calc)).
 :- use_module(ac(ac_debug)).
 :- use_module(ac(ac_read)).
