@@ -5,7 +5,7 @@ Implementation
 --------------
 
   [ ] Swipl:
-    [o] BUG: GUI tracer names multiple variables `A`.
+    [x] BUG: GUI tracer names multiple variables `A`.
   [ ] Architecture:
     [ ] BUG: Check why simulations no longer work.
     [ ] Add RDFS schema for AC models.
@@ -18,22 +18,27 @@ Implementation
     [x] Display causal formula in Web interface.
     [x] Make causes in table clickable and color cause in graphic.
     [x] Return causal path next to clause. Color causal path as well as cause.
+  [ ] Modeling environment:
+    [ ] Finalize CLI + Web UI.
+    [ ] Document CLI + Web UI.
+    [ ] Top-level (CLI) language translation into causal formalism.
+    [ ] Document top-level language.
+    [ ] Quantify over contexts (potential/actual causer).
+    [ ] Unit testing: example models from literature.
   [ ] Modeling:
     [ ] Golden standard: a collection of examples.
-    [ ] Expressivity: can we express common intuitions in terms of causation?
-    [ ] CLI + Web UI
-    [ ] Create models
-    [ ] Combine models
-  [ ] Modeling environment:
-    [ ] Quantifying over contexts (potential/actual causer).
-    [ ] Concept mapping UI.
-    [ ] Top-level language translation into causal formalism.
-    [ ] Unit testing: example models from literature.
+    [ ] Expressivity: Can we express common intuitions in terms of causation?
+    [ ] Patterns: What are the often occurring composed expressions that constitute causal principles in medical-ethical discourse?
+    [ ] Create some models.
+    [ ] Combine some models (model composition).
 
 Dissemination
 -------------
 
-  [ ] Paper:
+  [ ] Counterfactual reasoning in ClioPatria paper?
+    [ ] Discuss with JW whether this is sufficiently novel.
+  [ ] Implemented KR paper?
+  [ ] Medical-ethics paper:
     [ ] Introduction
     [ ] Related work:
       [ ] Actual Causation (Pearl, Halpern)
