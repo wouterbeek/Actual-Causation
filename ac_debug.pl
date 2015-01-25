@@ -16,20 +16,18 @@
 */
 
 :- use_module(library(aggregate)).
-:- use_module(library(apply)).
+:- use_module(library(dcg/basics), [integer//1]).
 :- use_module(library(debug)).
 :- use_module(library(lists), except([delete/3,subset/2])).
 :- use_module(library(semweb/rdf_db), except([rdf_node/1])).
 
 :- use_module(plDcg(dcg_atom)).
 :- use_module(plDcg(dcg_bracket)).
-:- use_module(plDcg(dcg_cardinal)).
 :- use_module(plDcg(dcg_code)).
 :- use_module(plDcg(dcg_generics)).
 :- use_module(plDcg(dcg_unicode)).
 
 :- use_module(plRdf(api/rdfs_read)).
-:- use_module(plRdf(rdf_name)).
 
 
 
