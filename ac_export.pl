@@ -38,6 +38,7 @@ Export graphs of actual causality.
 
 
 %! causal_graph(+Model:iri, -ExportGraph:compound) is det.
+% Returns the export graph for a causal model.
 
 causal_graph(M, ExportG):-
   causal_vertices_edges(M, Vs, Es),
@@ -54,6 +55,7 @@ causal_graph(M, ExportG):-
 
 
 %! causal_path(+Models:iri, -ExportGraph:compound) is det.
+% Returns the export graph for a specific causal path inside a causal model.
 
 causal_path(Models, ExportG):-
   once(models(M, _, _, Xs, Zs, Models)),
@@ -74,6 +76,12 @@ causal_path(Models, ExportG):-
 
 
 % HELPERS %
+
+%! causal_vertices_edges(
+%!   +Model:iri,
+%!   -Vertices:ordset,
+%!   -Edges:ordset(pair)
+%! ) is det.
 
 causal_vertices_edges(M, Vs, Es):-
   % 1: Endogenous edges.
@@ -115,6 +123,7 @@ exogenous_edge(X, edge(aco:exogenous,_,X)).
 %!   +Vertex:iri,
 %!   -Color:atom
 %! ) is det.
+% Assigns colots to vertices in a causal model.
 
 ac_vertex_color(Xs, _, V, red):-
   memberchk(V, Xs), !.
@@ -125,6 +134,7 @@ ac_vertex_color(_, _, _, black).
 
 
 %! ac_vertex_label(+Vertex:iri, -Label:atom) is det.
+% Assigns labels to vertices in a causal model.
 
 ac_vertex_label(aco:exogenous, 'Exogenous'):- !.
 ac_vertex_label(V, VLabel):-

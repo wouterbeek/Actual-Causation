@@ -33,6 +33,9 @@ Graph-theoretic predicates used for calculating actual causation.
 %!   +CausedVars:ordset,
 %!   -PathVars:ordset
 %! ) is det.
+% Returns the variables (or vertices in the causal Model)
+% that are candidates for appearing in a causal path.
+%
 % A causal path must adhere to the following conditions:
 %   1. It must end in all and only caused variables.
 %   2. It must start in all and only cause variables.

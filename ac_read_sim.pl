@@ -73,6 +73,8 @@ models(M, Us, Phi, Xs, Zs, Models):-
 %!   ?AssignmentEntryPl:pair(iri,integer),
 %!   ?AssignmentEntry:iri
 %! ) is nondet.
+% Succeeds for *primitive events*, i.e., formulas of the form
+% $X = x$ with $X \in \mathcal{V}$ and $x \in \mathcal{R}(X)$.
 
 primitive_event(Var-Val, Entry):-
   rdfs_individual_of(Entry, aco:'AssignmentEntry'),

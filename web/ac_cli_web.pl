@@ -2,6 +2,11 @@
 
 /** <module> Web-based UI to the CLI of Actual-Causation
 
+Displays a model (description, causal graph, signature)
+and its simulation results (causes and contexts).
+
+---
+
 @author Wouter Beek
 @version 2014/12-2015/01
 */
@@ -45,6 +50,7 @@
 
 
 
+% Model: A specific model.
 cli_model(Request):-
   request_query_nvpair(Request, model, M), !,
   once(rdfs_label_value(M, MLabel)),
@@ -53,13 +59,15 @@ cli_model(Request):-
     [title(['Actual-Causation CLI :: Model :: ',MLabel])],
     [\description(M),\causal_graph(M),\signature(M)]
   ).
+% Model: Enumerate all models by default.
 cli_model(_):-
   reply_html_page(
     menu_page,
     title('Actual-Causation CLI :: Model :: Overview'),
-    \list_models(cli_model)
+    ['Models:',\list_models(cli_model)]
   ).
 
+% Simulate: A specific model.
 cli_simulate(Request):-
   request_query_nvpair(Request, model, M), !,
   once(rdfs_label_value(M, MLabel)),
@@ -73,6 +81,7 @@ cli_simulate(Request):-
       \causes(M)
     ]
   ).
+% Simulate: A specific model and a specific causal path.
 cli_simulate(Request):-
   request_query_nvpair(Request, models, Models), !,
   rdf_has(M, aco:models, Models),
@@ -87,6 +96,7 @@ cli_simulate(Request):-
       \causes(M)
     ]
   ).
+% Simulate: Enumerate all models by default:
 cli_simulate(_):-
   reply_html_page(
     menu_page,

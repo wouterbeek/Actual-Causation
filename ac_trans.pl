@@ -10,7 +10,7 @@
 
 /** <module> Actual Causation: Translation
 
-Translation from natural language input and RDF representation.
+Translation from natural language input to an RDF representation.
 
 @author Wouter Beek
 @version 2015/01
@@ -30,6 +30,7 @@ Translation from natural language input and RDF representation.
 %!   +Term:compound,
 %!   -InstantiatedTerm:compound
 %! ) is det.
+% Simple instantiation for RDF-represented AC terms.
 
 instantiate_term(_, _, N, N):-
 	integer(N), !.

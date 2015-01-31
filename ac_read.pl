@@ -38,6 +38,8 @@
 
 %! actual_value(+Variable:iri, +Value:integer) is semidet.
 %! actual_value(+Variable:iri, -Value:integer) is semidet.
+% Succeeds for the *actual value* of a given variable.
+% This is the value a variable has in the current possible world.
 
 actual_value(Var, Val):-
   once(rdf_typed_literal(Var, aco:value, Val, xsd:integer)).
@@ -45,7 +47,15 @@ actual_value(Var, Val):-
 
 
 %! determine_value(+Model:iri, +Variable:iri, -Value:integer) is det.
-% Succeeds for the determined value of the given variable.
+% Succeeds if the given variable's value is determined.
+%
+% A value is determined if:
+% # It is an actual value.
+% # It can be determined based on actual values
+%   and a single structural equation.
+%
+% Calculating determined values recursively is called *satisfaction*
+% (see module ac_calc.pl).
 
 determine_value(_, Var, Val):-
 	actual_value(Var, Val), !.
@@ -76,6 +86,8 @@ determined_variable(M, Var):-
 
 %! outer_variable(+Model:iri, +Variable:iri) is semidet.
 %! outer_variable(+Model:iri, -Variable:iri) is nondet.
+% Succeeds for *outer variables*, i.e., variables that are determined by
+% exogenous variables exclusively.
 
 outer_variable(M, Var):-
   rdf_has(M, aco:endogenous_variable, Var),
@@ -85,6 +97,7 @@ outer_variable(M, Var):-
 
 %! potential_value(+Variable:iri, +Value:integer) is semidet.
 %! potential_value(+Variable:iri, -Value:integer) is multi.
+% Succeeds for values a variable can take according to its signature.
 
 potential_value(Var, Val):-
   once(rdf_has(Var, aco:range, Range)),
@@ -95,6 +108,8 @@ potential_value(Var, Val):-
 
 
 %! variable(+Model:iri, +Name:atom, -Variable:iri) is semidet.
+% Succeeds for endogenous variables with the given Name.
+% (Exogenous variables have no name.)
 
 variable(M, Name, Var):-
   rdf_has(M, aco:endogenous_variable, Var),

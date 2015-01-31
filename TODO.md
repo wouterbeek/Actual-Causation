@@ -6,6 +6,8 @@ Implementation
 
   [ ] Swipl:
     [x] BUG: GUI tracer names multiple variables `A`.
+  [ ] Libs:
+    [x] BUG: Causal graph does not render due to float// bug in plGraphViz.
   [ ] Architecture:
     [ ] BUG: Check why simulations no longer work.
     [ ] Add RDFS schema for AC models.
@@ -29,6 +31,7 @@ Implementation
     [ ] Golden standard: a collection of examples.
     [ ] Expressivity: Can we express common intuitions in terms of causation?
     [ ] Patterns: What are the often occurring composed expressions that constitute causal principles in medical-ethical discourse?
+      [ ] Quality Adjusted Life Years (QALY)
     [ ] Create some models.
     [ ] Combine some models (model composition).
 
@@ -45,13 +48,13 @@ Dissemination
       [ ] Causality in ethics (Aristotle, wierd paper, determinism in philosophy of mind).
       [ ] Responsibility (as counterfactual, Frankfurt)
       [ ] Lifestyle differentiation in health care
+      [ ] Alt. causation def.
     [ ] Methodology/Approach:
       [ ] Conceptual  analysis: use of an existing axiomatization of causality for modeling responsibility as causation.
     [ ] Implementation: modeling interface for responsibility as causation.
     [ ] Evaluation:
       [ ] Taking an existing example from the ethics domain it is possible to construe a consistent model that supports purported intuitions.
     [ ] Conclusion & future work
-  [ ] Present at WAI 2015/01/12.
 
 Loose ends
 ----------

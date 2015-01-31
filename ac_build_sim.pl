@@ -71,6 +71,7 @@ assert_default_causal_formula(M, Phi):-
 %!   +CausalPath:ordset(iri),
 %!   -Models:iri
 %! ) is det.
+% Asserts a single causal explanation for a causal model.
 
 assert_models(M, Us, Phi, Xs, Zs, Models):-
   models(M, Us, Phi, Xs, Zs, Models), !.
@@ -87,19 +88,6 @@ assert_models(M, Us, Phi, Xs, Zs, Models):-
 
 
 % HELPERS %
-
-%! assert_vars0(
-%!   +SubPaths:list(atom),
-%!   +Class:iri,
-%!   +Vs:ordset(iri),
-%!   -Variables:iri
-%! ) is det.
-
-assert_vars0(SubPaths, Class, Vs, Vars):-
-  rdf_create_next_resource(ac, SubPaths, Class, ac, Vars),
-  rdf_assert_list(Vs, Vars, ac, []).
-
-
 
 %! assert_assignment0(
 %!   +SubPaths:list(atom),
@@ -142,3 +130,16 @@ assert_causal_formula0(S, Phi, Default):-
   ;   rdf_global_id(aco:causal_formula, P)
   ),
   rdf_assert_simple_literal(S, P, Phi0, ac).
+
+
+
+%! assert_vars0(
+%!   +SubPaths:list(atom),
+%!   +Class:iri,
+%!   +Vs:ordset(iri),
+%!   -Variables:iri
+%! ) is det.
+
+assert_vars0(SubPaths, Class, Vs, Vars):-
+  rdf_create_next_resource(ac, SubPaths, Class, ac, Vars),
+  rdf_assert_list(Vs, Vars, ac, []).

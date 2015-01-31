@@ -27,9 +27,10 @@
 
 
 %! calculate_all_values(+Model:iri, -Solution:list(pair(iri,integer))) is det.
-% Use a database snapshot for a specific counterfactual with a contingency.
-% If Assignment is the empty list then Solution represents what is the case,
-% i.e., it describes the real world.
+% Returns the values of all variables in the given causal Model.
+% This assumes that all values are determined.
+%
+% Does not change the causal model in any way (runs in snapshot).
 
 calculate_all_values(M, Solution):-
   rdf_transaction(
@@ -75,7 +76,12 @@ calculate_some_value_under_assignment0(M, Var, Val):-
 %!   +Model:iri,
 %!   +Assignment:list(pair(iri,integer)),
 %!   +Phi:compound
-%! ) is det.
+%! ) is semidet.
+% Succeeds if Phi can be satisfied in the given causal Model
+% under the given Assignment.
+%
+% A database snapshot is used in order to express
+% the counterfactual with a contingency.
 
 satisfy_formula(M, As, Phi):-
   rdf_transaction(

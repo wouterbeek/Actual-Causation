@@ -54,10 +54,13 @@
 %! ) is nondet.
 
 calculate_models(M, Us, Phi_atom, Xs, Zs, Models):-
+  % @tbd Store causal formulas explicitly in RDF.
   read_term_from_atom(Phi_atom, Phi_term, []),
+  % Replace the causal variable names with Prolog variables.
   instantiate_term(M, var, Phi_term, Phi),
 
   % NONDET.
+  % Generate contexts for the given causal model.
   context(M, Us),
 
   % Reset cause memoization on a per-context basis.
@@ -100,8 +103,9 @@ calculate_models(M, Us, Phi, Xs, Zs):-
   satisfy_formula(M, [], Phi),
   debug_models(M, Us, [], Phi), % DEB
 
-  % Collect all endogenous variables.
+  % Calculate the value of the endogenous variables.
   calculate_all_values(M, AVs),
+  % Collect the endogenous variables.
   pairs_keys(AVs, Vs),
 
   % It does not make sense for cause and caused to be the same,
@@ -110,12 +114,13 @@ calculate_models(M, Us, Phi, Xs, Zs):-
   ord_subtract(Vs, PhiVars, Vs0),
 
   % NONDET.
-  % Split the endogenous variables into those constituting a causal path
-  % and those that are "off to the side" (condition 2).
+  % Split the endogenous variables into:
+  %   1. Those that constituting the causal path and
+  %   2. those that are "off to the side" (condition 2).
   partition(Vs0, [A,B]),
 
   % Notice that the order in which partition members occur is arbitrary.
-  % Therefore for each binary partition we have two causal paths to try out.
+  % For each binary partition we therefore have two causal paths to try out.
   (   A = Zs,
       B = Ws
   ;   A = Ws,
@@ -178,6 +183,7 @@ calculate_models(M, Us, Phi, Xs, Zs):-
 
 
 
+
 % HELPERS %
 
 %! assign_variables(
@@ -195,6 +201,10 @@ assign_variables([Var|T1], [Var-Val|T2]):-
 
 %! context(+Model:iri, +Context:list(pair(iri,integer))) is semidet.
 %! context(+Model:iri, -Context:list(pair(iri,integer))) is nondet.
+% Succeeds for context of Model.
+%
+% A context is a possible assignment of values to
+% all and only outer variables.
 
 context(M, Us):-
   nonvar(Us), !,

@@ -10,9 +10,7 @@
                     % +Signature:list(pair(atom,list(integer))),
                     % +StructuralEquations:list(compound)
                     % -Model:iri
-    assign_value/1, % +Assignment:pair(iri,integer)
-    run_with_assigned_values/2 % +Assignment:list(pair(iri,integer))
-                               % :Goal
+    assign_value/1 % +Assignment:pair(iri,integer)
   ]
 ).
 
@@ -39,8 +37,6 @@
 
 :- use_module(ac(ac_read)).
 
-:- meta_predicate(run_with_assigned_values(+,0)).
-
 
 
 
@@ -51,6 +47,7 @@
 %!   +Signature:list(pair(atom,list(integer))),
 %!   +StructuralEquations:list(compound)
 %! ) is det.
+% @see assert_model/5
 
 assert_model(Name, Description, Signature, StructuralEquations):-
   assert_model(Name, Description, Signature, StructuralEquations, _).
@@ -62,6 +59,7 @@ assert_model(Name, Description, Signature, StructuralEquations):-
 %!   +StructuralEquations:list(compound),
 %!   -Model:iri
 %! ) is det.
+% Asserts a causal model in RDF.
 
 assert_model(Name, Description, Signature, StructuralEquations, M):-
   % aco:Model
@@ -88,6 +86,7 @@ assert_model(Name, Description, Signature, StructuralEquations, M):-
 %!   +Model:iri,
 %!   +SignatureEntry:pair(atom,list(integer))
 %! ) is det.
+% Assert the signature for a causal model.
 
 assert_signature(M, in(Name,Range0)):-
   % aco:EndogenousVariable
@@ -119,6 +118,7 @@ assert_signature(M, in(Name,Range0)):-
 %!   +Model:iri,
 %!   +StructuralEquation:compound
 %! ) is det.
+% Add a structural equation to a causal model.
 
 assert_structural_equation(M, Eq):-
   Eq = #=(Left,Right),
@@ -135,29 +135,11 @@ assert_structural_equation(M, Eq):-
 
 
 %! assign_value(+Assignment:pair(iri,integer)) is det.
+% Assign a value to a variable.
 
 assign_value(Var-Val):-
   rdf_retractall(Var, aco:value, _),
   rdf_assert_typed_literal(Var, aco:value, Val, xsd:integer, ac).
-
-
-
-%! run_with_assigned_values(+Assignment:list(pair(iri,integer)), :Goal) .
-
-run_with_assigned_values(As, Goal):-
-  findall(
-    Var-OldVal,
-    (
-      member(Var-_, As),
-      rdf_typed_literal(Var, aco:value, OldVal, xsd:integer)
-    ),
-    OldAs
-  ),
-  setup_call_cleanup(
-    maplist(assign_value, As),
-    Goal,
-    maplist(assign_value, OldAs)
-  ).
 
 
 
