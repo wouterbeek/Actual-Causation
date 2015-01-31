@@ -65,7 +65,7 @@ calculate_models(M, Us, Phi_atom, Xs, Zs, Models):-
 
   % Reset cause memoization on a per-context basis.
   retractall(cause0(M, Us, Phi, _)),
-  
+
   rdf_transaction(
     forall(
       % Set the context in the current database snapshot.
@@ -98,9 +98,12 @@ calculate_models(M, Us, Phi_atom, Xs, Zs, Models):-
 calculate_models(M, Us, Phi, Xs, Zs):-
   % Since we are now within an RDF transaction, we can assert the context.
   maplist(assign_value, Us),
-  
+
   % The caused must be the case (Condition 1).
+forall(rdf(X, aco:value, Y), format(user_output, '~w = ~w\n', [X,Y])),
   satisfy_formula(M, [], Phi),
+gtrace,
+forall(rdf(X, aco:value, Y), format(user_output, '~w = ~w\n', [X,Y])),
   debug_models(M, Us, [], Phi), % DEB
 
   % Calculate the value of the endogenous variables.
