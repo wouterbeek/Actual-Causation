@@ -3,9 +3,10 @@
   [
     calculate_models/6 % +Model:iri
                        % ?Context:ordset(pair(iri,integer))
-                       % +CausalFormula:atom
+                       % ?CausalFormula:atom
                        % ?Cause:ordset(pair(iri,integer))
                        % -CausalPath:ordset(iri)
+                       % -Models:iri
   ]
 ).
 
@@ -48,11 +49,16 @@
 %! calculate_models(
 %!   +Model:iri,
 %!   ?Context:ordset(pair(iri,integer)),
-%!   +CausalFormula:atom,
+%!   ?CausalFormula:atom,
 %!   ?Cause:ordset(iri),
-%!   -CausalPath:ordset(iri)
+%!   -CausalPath:ordset(iri),
+%!   -Models:iri
 %! ) is nondet.
 
+calculate_models(M, Us, Phi_atom, Xs, Zs, Models):-
+  var(Phi_atom), !,
+  once(rdf_simple_literal(M, aco:default_causal_formula, Phi_atom)),
+  calculate_models(M, Us, Phi_atom, Xs, Zs, Models).
 calculate_models(M, Us, Phi_atom, Xs, Zs, Models):-
   % @tbd Store causal formulas explicitly in RDF.
   read_term_from_atom(Phi_atom, Phi_term, []),

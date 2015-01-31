@@ -145,10 +145,6 @@ causal_path(Models) -->
 
 causes(M) -->
   {
-    once(rdf_simple_literal(M, aco:default_causal_formula, Phi_atom)),
-    read_term_from_atom(Phi_atom, Phi_term, []),
-    instantiate_term(M, var, Phi_term, Phi),
-
     aggregate_all(
       set([assignment(Us),vars(Xs),vars(Zs),uri(Location,'$@$')]),
       (
@@ -165,7 +161,9 @@ causes(M) -->
         'Contexts & Causes of ',
         \rdf_term_html(plTabular, M),
         &(8871),
-        \causal_formula(Phi)
+        Phi_atom
+        % @tbd Use `Phi` i.o. `Phi_atom`.
+        %\causal_formula(Phi)
       ]),
       html_ac,
       [['Contexts','Cause','Causal path','Focus']|DataRows],
@@ -173,12 +171,12 @@ causes(M) -->
     )
   ).
 
-models0(M, Us, Phi, Xs, Zs, Models):-
-  (   \+ models(M, Us, Phi, Xs, Zs, Models)
+models0(M, Us, Phi_atom, Xs, Zs, Models):-
+  (   \+ models(M, Us, Phi_atom, Xs, Zs, Models)
   ->  % NONDET.
-      calculate_models(M, Us, Phi, Xs, Zs, Models)
+      calculate_models(M, Us, Phi_atom, Xs, Zs, Models)
   ;   % NONDET.
-      models(M, Us, Phi, Xs, Zs, Models)
+      models(M, Us, Phi_atom, Xs, Zs, Models)
   ).
 
 description(M) -->
