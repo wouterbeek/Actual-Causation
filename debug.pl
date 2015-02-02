@@ -12,6 +12,7 @@
 %%%%:- debug_all_files.
 
 
+:- use_module(library(apply)).
 :- use_module(library(clpfd)).
 
 :- use_module(ac(ac_build)).
@@ -21,17 +22,16 @@
 :- initialization(debug_init).
 
 debug_init:-
-  load_test_model(forest_fire, M),
-  forall(
-    calculate_models(M, _, _, _, _, _),
-    true
-  ).
+  maplist(load_test_model, [forest_fire,suze_and_billy]).
 
 load_test_models:-
   forall(
     load_test_model(_, _),
     true
   ).
+
+load_test_model(Name):-
+  load_test_model(Name, _).
 
 load_test_model(forest_fire, M):-
   assert_model(

@@ -40,7 +40,7 @@
 :- use_module(ac(ac_read)).
 :- use_module(ac(ac_trans)).
 
-:- dynamic(cause0/4).
+:- dynamic(models0/7).
 
 
 
@@ -70,20 +70,21 @@ calculate_models(M, Us, Phi_atom, Xs, Zs, Models):-
   context(M, Us),
 
   % Reset cause memoization on a per-context basis.
-  retractall(cause0(M, Us, Phi, _)),
+  retractall(models0(M, Us, Phi, _, _, _)),
 
   rdf_transaction(
     forall(
       % Set the context in the current database snapshot.
       calculate_models(M, Us, Phi, Xs, Zs),
-      (
-        % Store this result to ensure minimality of future results.
-        assert(cause0(M, Us, Phi, Xs)),
-        assert_models(M, Us, Phi_term, Xs, Zs, Models)
-      )
+      % Store this result to ensure minimality of future results.
+      assertz(models0(M, Us, Phi, Xs, Zs, Models))
     ),
     _,
     [snapshot(true)]
+  ),
+  forall(
+    retract(models0(M, Us, Phi, Xs, Zs, Models)),
+    assert_models(M, Us, Phi_term, Xs, Zs, Models)
   ).
 
 %! calculate_models(
@@ -106,10 +107,7 @@ calculate_models(M, Us, Phi, Xs, Zs):-
   maplist(assign_value, Us),
 
   % The caused must be the case (Condition 1).
-forall(rdf(X, aco:value, Y), format(user_output, '~w = ~w\n', [X,Y])),
   satisfy_formula(M, [], Phi),
-gtrace,
-forall(rdf(X, aco:value, Y), format(user_output, '~w = ~w\n', [X,Y])),
   debug_models(M, Us, [], Phi), % DEB
 
   % Calculate the value of the endogenous variables.
@@ -155,7 +153,7 @@ forall(rdf(X, aco:value, Y), format(user_output, '~w = ~w\n', [X,Y])),
   % (condition 3: minimality).
   % Notice that smaller causes are considered first.
   \+ ((
-    cause0(M, Us, Phi, Xs0),
+    models0(M, Us, Phi, Xs0, _, _),
     subset(Xs0, Xs)
   )),
 
