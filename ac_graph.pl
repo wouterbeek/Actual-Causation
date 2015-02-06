@@ -26,6 +26,25 @@ Graph-theoretic predicates used for calculating actual causation.
 
 
 
+%! causal_path(
+%!   +Model:atom,
+%!   +Froms:list(atom),
+%!   +Tos:list(atom),
+%!   -Path:list(atom)
+%! ) is nondet.
+
+causal_path(M, Xs, Ys, P):-
+  member(X, Xs),
+  member(Y, Ys),
+  path(
+    ca_vertex,
+    ca_edge,
+    ca_neighbor,
+    Model,
+    Y,
+    X,
+    Path
+  ).
 
 %! has_causal_path(
 %!   +Model:atom,
@@ -45,8 +64,6 @@ has_causal_path(Model, Xs, PhiVars, Zs):-
   aggregate_all(
     set(Path),
     (
-      member(X, Xs),
-      member(Y, PhiVars),
       path(
         ca_vertex,
         ca_edge,
