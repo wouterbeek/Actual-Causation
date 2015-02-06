@@ -20,7 +20,6 @@
 
 :- use_module(library(apply)).
 :- use_module(library(aggregate)).
-:- use_module(library(clpfd)).
 :- use_module(library(lists), except([delete/3,subset/2])).
 :- use_module(library(ordsets)).
 :- use_module(library(pairs)).
@@ -37,10 +36,11 @@
 :- use_module(ac(ac_build_sim)).
 :- use_module(ac(ac_calc)).
 :- use_module(ac(ac_debug)).
+:- use_module(ac(ac_graph)).
 :- use_module(ac(ac_read)).
 :- use_module(ac(ac_trans)).
 
-:- dynamic(models0/7).
+:- dynamic(models0/6).
 
 
 
@@ -115,39 +115,11 @@ calculate_models(M, Us, Phi, Xs, Zs):-
   % Collect the endogenous variables.
   pairs_keys(AVs, Vs),
 
-  % It does not make sense for cause and caused to be the same,
-  % so do not consider variables that occur in the causal formula.
-  formula_to_variables(Phi, PhiVars),
-  ord_subtract(Vs, PhiVars, Vs0),
-
-  % NONDET.
-  % Split the endogenous variables into:
-  %   1. Those that constituting the causal path and
-  %   2. those that are "off to the side" (condition 2).
-  partition(Vs0, [A,B]),
-
-  % Notice that the order in which partition members occur is arbitrary.
-  % For each binary partition we therefore have two causal paths to try out.
-  (   A = Zs,
-      B = Ws
-  ;   A = Ws,
-      B = Zs
-  ),
-
-  % NONDET.
+  % NONDET
   % Find a potential cause.
-  % The cause must belong to the causal path.
-  %
-  % @tbd A cause must not only be part of the causel path;
-  %      it must be the onset of the causal path.
-  %      ```prolog
-  %      \+ (member(X, Xs), Model:causal_link(_-X)),
-  %      has_causal_path(Model, Xs, PhiVars, Zs),
-  %      ```
-  %
-  % A cause must be the case (Condition 1).
-  % This means that it must consist entirely of values from the real world.
-  subset(Xs, Zs),
+  % The cause must belong to a *causal explanation*,
+  % i.e., a collection of causal paths.
+  causal_path(M, Phi, Xs, Zs),
 
   % No subcause of a cause should be considered a cause
   % (condition 3: minimality).
@@ -159,6 +131,15 @@ calculate_models(M, Us, Phi, Xs, Zs):-
 
   % A cause must be non-empty.
   Xs \== [],
+
+  % The causal explanation splits the endogenous variables into:
+  %   1. Those that constituting the causal explanation and
+  %   2. those that are "off to the side" (condition 2).
+  ord_subtract(Vs, Zs, Ws),
+
+  % A cause must be the case (Condition 1).
+  % This means that it must consist entirely of values from the real world.
+  % THIS IS ALWAYS THE CASE!
 
   % NONDET (x2).
   % Construct a contingency under which the counterfactual
@@ -226,18 +207,3 @@ context0(M, Us):-
     Vars
   ),
   assign_variables(Vars, Us).
-
-
-
-%! formula_to_variables(+Phi:compound, -Variables:ordset(iri)) is det.
-% Boolean combinations of primitive events.
-
-formula_to_variables(not(Phi), Vars):- !,
-  formula_to_variables(Phi, Vars).
-formula_to_variables(and(Phi,Psi), Vars):- !,
-  maplist(formula_to_variables, [Phi,Psi], [Vars1,Vars2]),
-  ord_union(Vars1, Vars2, Vars).
-formula_to_variables(or(Phi,Psi), Vars):- !,
-  maplist(formula_to_variables, [Phi,Psi], [Vars1,Vars2]),
-  ord_union(Vars1, Vars2, Vars).
-formula_to_variables(Var-_, [Var]).

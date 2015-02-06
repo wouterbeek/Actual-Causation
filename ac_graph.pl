@@ -1,10 +1,10 @@
 :- module(
   ac_graph,
   [
-    has_causal_path/4 % +Model:iri
-                      % +Cause:ordset(iri)
-                      % +Caused:ordset(iri)
-                      % -Causal:ordset(iri)
+    causal_path/4 % +Model:atom
+                  % +Phi:atom
+                  % -Cause:ordset(atom)
+                  % -CausalPath:ordset(atom)
   ]
 ).
 
@@ -12,89 +12,73 @@
 
 Graph-theoretic predicates used for calculating actual causation.
 
+A causal path must adhere to the following conditions:
+  1. It must end in all and only caused variables.
+  2. It must start in all and only cause variables.
+  3. No superfluous or non-traversed variables are included.
+
+---
+
 @author Wouter Beek
-@version 2014/12-2015/01
+@version 2014/12-2015/02
 */
 
 :- use_module(library(aggregate)).
 :- use_module(library(apply)).
 :- use_module(library(lists), except([delete/3,subset/2])).
 :- use_module(library(ordsets)).
+:- use_module(library(semweb/rdf_db), except([rdf_node/1])).
 
-:- use_module(plGraph(graph_walk)).
 
 
 
 
 %! causal_path(
 %!   +Model:atom,
-%!   +Froms:list(atom),
-%!   +Tos:list(atom),
-%!   -Path:list(atom)
+%!   +Phi:atom,
+%!   -Cause:ordset(atom),
+%!   -CausalPath:ordset(atom)
 %! ) is nondet.
 
-causal_path(M, Xs, Ys, P):-
-  member(X, Xs),
-  member(Y, Ys),
-  path(
-    ca_vertex,
-    ca_edge,
-    ca_neighbor,
-    Model,
-    Y,
-    X,
-    Path
+causal_path(_, Phi, Xs, Zs):-
+  formula_to_variables(Phi, PhiVars),
+  maplist(causal_subpath, PhiVars, Pairs),
+  maplist(causal_combi_choice, Pairs, Paths, Xs),
+  maplist(list_to_ord_set, Paths, Sets),
+  ord_union(Sets, Zs).
+
+
+%! formula_to_variables(+Phi:compound, -Variables:ordset(iri)) is det.
+% Boolean combinations of primitive events.
+
+formula_to_variables(not(Phi), Vars):- !,
+  formula_to_variables(Phi, Vars).
+formula_to_variables(and(Phi,Psi), Vars):- !,
+  maplist(formula_to_variables, [Phi,Psi], [Vars1,Vars2]),
+  ord_union(Vars1, Vars2, Vars).
+formula_to_variables(or(Phi,Psi), Vars):- !,
+  maplist(formula_to_variables, [Phi,Psi], [Vars1,Vars2]),
+  ord_union(Vars1, Vars2, Vars).
+formula_to_variables(Var-_, [Var]).
+
+
+causal_subpath(Y, Y-Paths):-
+  aggregate_all(
+    set(path(X,P,Y)),
+    path(Y, P, X),
+    Paths
   ).
 
-%! has_causal_path(
-%!   +Model:atom,
-%!   +CauseVars:ordset,
-%!   +CausedVars:ordset,
-%!   -PathVars:ordset
-%! ) is det.
-% Returns the variables (or vertices in the causal Model)
-% that are candidates for appearing in a causal path.
-%
-% A causal path must adhere to the following conditions:
-%   1. It must end in all and only caused variables.
-%   2. It must start in all and only cause variables.
-%   3. No superfluous or non-traversed variables are included.
+path(Y, P, X):-
+  path(Y, [Y], P, X).
 
-has_causal_path(Model, Xs, PhiVars, Zs):-
-  aggregate_all(
-    set(Path),
-    (
-      path(
-        ca_vertex,
-        ca_edge,
-        ca_neighbor,
-        Model,
-        Y,
-        X,
-        Path
-      )
-    ),
-    Paths
-  ),
-  maplist(path_to_vertices, Paths, Vss),
-  ord_union(Vss, Zs).
+path(Y, _, [Y], Y):-
+  \+ rdf_has(_, aco:causes, Y), !.
+path(Y, T1, [Y|T2], X):-
+  rdf_has(Z, aco:causes, Y),
+  \+ memberchk(Z, T1),
+  path(Z, [Z|T1], T2, X).
 
-path_to_vertices([_,_|T], Vs):-
-  path_to_vertices0(T, Vs0),
-  list_to_ord_set(Vs0, Vs).
 
-path_to_vertices0([], []).
-path_to_vertices0([H], [H]):- !.
-path_to_vertices0([V,_|T1], [V|T2]):-
-  path_to_vertices0(T1, T2).
-
-ca_vertex(Model, V):-
-  Model:causal_link(V-_).
-ca_vertex(Model, V):-
-  Model:causal_link(_-V).
-
-ca_edge(Model, V-W):-
-  Model:causal_link(W-V).
-
-ca_neighbor(Model, V, W):-
-  ca_edge(Model, V-W).
+causal_combi_choice(Y-Paths, P, X):-
+  member(path(X,P,Y), Paths).
