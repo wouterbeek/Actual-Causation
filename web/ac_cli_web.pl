@@ -148,7 +148,7 @@ causes(M) -->
     aggregate_all(
       set([assignment(Us),vars(Xs),vars(Zs),uri(Location,'$@$')]),
       (
-        models0(M, Us, Phi_atom, Xs, Zs, Models),
+        models0(M, Us, Phi_atom, _, Xs, Zs, Models),
         http_location_by_id(cli_simulate, Base),
         uri_query_add_nvpair(Base, models, Models, Location)
       ),
@@ -171,13 +171,13 @@ causes(M) -->
     )
   ).
 
-models0(M, Us, Phi_atom, Xs, Zs, Models):-
-  (   \+ models(M, Us, Phi_atom, Xs, Zs, Models)
-  ->  % NONDET.
-      calculate_models(M, Us, Phi_atom, Xs, Zs, Models)
-  ;   % NONDET.
-      models(M, Us, Phi_atom, Xs, Zs, Models)
-  ).
+models0(M, Us, Phi_atom, Phi, Xs, Zs, Models):-
+  (   models(M, _, _, _, _, _)
+  ->  true
+  ;   calculate_models(M, Us, Phi_atom, Phi, Xs)
+  ),
+  % NONDET.
+  models(M, Us, Phi, Xs, Zs, Models).
 
 description(M) -->
   {rdf_simple_literal(M, dcterms:description, Description, _)}, !,

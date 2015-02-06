@@ -3,6 +3,11 @@
   [
     assert_default_causal_formula/2, % +Model:iri
                                      % +CausalFormula:compound
+    assert_models/5, % +Model:iri
+                     % +Context:ordset(pair(iri,integer))
+                     % +CausalFormula:compound
+                     % +Cause:ordset(iri)
+                     % +CausalPath:ordset(iri)
     assert_models/6 % +Model:iri
                     % +Context:ordset(pair(iri,integer))
                     % +CausalFormula:compound
@@ -17,7 +22,7 @@
 Simulation results stored in RDF.
 
 @author Wouter Beek
-@version 2015/01
+@version 2015/01-2015/02
 */
 
 :- use_module(library(apply)).
@@ -41,8 +46,8 @@ assert_cause(Models, Xs):-
 
 
 
-assert_causal_formula(Models, Phi):-
-  assert_causal_formula0(Models, Phi, false).
+assert_causal_formula(Models, Phi_term):-
+  assert_causal_formula0(Models, Phi_term, false).
 
 
 
@@ -68,18 +73,30 @@ assert_default_causal_formula(M, Phi):-
 %!   +Context:ordset(pair(iri,integer)),
 %!   +Phi:compound,
 %!   +Cause:ordset(iri),
+%!   +CausalPath:ordset(iri)
+%! ) is det.
+% @see assert_models/6
+
+assert_models(M, Us, Phi_term, Xs, Zs):-
+  assert_models(M, Us, Phi_term, Xs, Zs, _).
+
+%! assert_models(
+%!   +Model:iri,
+%!   +Context:ordset(pair(iri,integer)),
+%!   +Phi:compound,
+%!   +Cause:ordset(iri),
 %!   +CausalPath:ordset(iri),
 %!   -Models:iri
 %! ) is det.
 % Asserts a single causal explanation for a causal model.
 
-assert_models(M, Us, Phi, Xs, Zs, Models):-
-  models(M, Us, Phi, Xs, Zs, Models), !.
-assert_models(M, Us, Phi, Xs, Zs, Models):-
+assert_models(M, Us, Phi_term, Xs, Zs, Models):-
+  models(M, Us, Phi_term, Xs, Zs, Models), !.
+assert_models(M, Us, Phi_term, Xs, Zs, Models):-
   rdf_create_next_resource(ac, [models], aco:'Models', ac, Models),
   rdf_assert(M, aco:models, Models, ac),
   assert_context(Models, Us),
-  assert_causal_formula(Models, Phi),
+  assert_causal_formula(Models, Phi_term),
   assert_cause(Models, Xs),
   assert_causal_path(Models, Zs).
 
@@ -123,13 +140,13 @@ assert_assignment_entry(Var-Val, Entry):-
 
 
 
-assert_causal_formula0(S, Phi, Default):-
-  with_output_to(atom(Phi0), write_canonical(Phi)),
+assert_causal_formula0(S, Phi_term, Default):-
+  with_output_to(atom(Phi_atom), write_canonical(Phi_term)),
   (   Default == true
   ->  rdf_global_id(aco:default_causal_formula, P)
   ;   rdf_global_id(aco:causal_formula, P)
   ),
-  rdf_assert_simple_literal(S, P, Phi0, ac).
+  rdf_assert_simple_literal(S, P, Phi_atom, ac).
 
 
 

@@ -1,12 +1,11 @@
 :- module(
   ac_models,
   [
-    calculate_models/6 % +Model:iri
+    calculate_models/5 % +Model:iri
                        % ?Context:ordset(pair(iri,integer))
-                       % ?CausalFormula:atom
+                       % ?CausalFormula1:atom
+                       % ?CausalFormula2:atom
                        % ?Cause:ordset(pair(iri,integer))
-                       % -CausalPath:ordset(iri)
-                       % -Models:iri
   ]
 ).
 
@@ -15,7 +14,7 @@
 @author Wouter Beek
 @see [http://arxiv.org/abs/1106.2652](Actual causation and the art of modeling)
 @tbs Causal path restricts possible partitions.
-@version 2014/12-2015/01
+@version 2014/12-2015/02
 */
 
 :- use_module(library(apply)).
@@ -40,7 +39,7 @@
 :- use_module(ac(ac_read)).
 :- use_module(ac(ac_trans)).
 
-:- dynamic(models0/6).
+:- dynamic(models0/5).
 
 
 
@@ -49,52 +48,56 @@
 %! calculate_models(
 %!   +Model:iri,
 %!   ?Context:ordset(pair(iri,integer)),
-%!   ?CausalFormula:atom,
-%!   ?Cause:ordset(iri),
-%!   -CausalPath:ordset(iri),
-%!   -Models:iri
-%! ) is nondet.
+%!   ?CausalFormula1:atom,
+%!   ?CausalFormula2:atom,
+%!   ?Cause:ordset(iri)
+%! ) is det.
 
-calculate_models(M, Us, Phi_atom, Xs, Zs, Models):-
+calculate_models(M, Us, Phi_atom, Phi, Xs):-
   var(Phi_atom), !,
   once(rdf_simple_literal(M, aco:default_causal_formula, Phi_atom)),
-  calculate_models(M, Us, Phi_atom, Xs, Zs, Models).
-calculate_models(M, Us, Phi_atom, Xs, Zs, Models):-
+  calculate_models(M, Us, Phi_atom, Phi, Xs).
+calculate_models(M, Us, Phi_atom, Phi, Xs):-
   % @tbd Store causal formulas explicitly in RDF.
   read_term_from_atom(Phi_atom, Phi_term, []),
   % Replace the causal variable names with Prolog variables.
   instantiate_term(M, var, Phi_term, Phi),
 
-  % NONDET.
-  % Generate contexts for the given causal model.
-  context(M, Us),
-
-  % Reset cause memoization on a per-context basis.
-  retractall(models0(M, Us, Phi, _, _, _)),
-
-  rdf_transaction(
+  setup_call_cleanup(
+    % Reset cause memoization on a per-context basis.
+    retractall(models0(M, Us, Phi, _, _, _)),
+    % NONDET.
+    % Generate contexts for the given causal model.
     forall(
-      % Set the context in the current database snapshot.
-      calculate_models(M, Us, Phi, Xs, Zs),
-      % Store this result to ensure minimality of future results.
-      assertz(models0(M, Us, Phi, Xs, Zs, Models))
+      context(M, Us),
+      (
+
+        rdf_transaction(
+          forall(
+            % Set the context in the current database snapshot.
+            calculate_models0(M, Us, Phi, Xs, Zs),
+            % Store this result to ensure minimality of future results.
+            assertz(models0(M, Us, Phi, Xs, Zs))
+          ),
+          _,
+          [snapshot(true)]
+        )
+      )
     ),
-    _,
-    [snapshot(true)]
-  ),
-  forall(
-    retract(models0(M, Us, Phi, Xs, Zs, Models)),
-    assert_models(M, Us, Phi_term, Xs, Zs, Models)
+    forall(
+      retract(models0(M, Us, Phi, Xs, Zs)),
+      assert_models(M, Us, Phi_term, Xs, Zs)
+    )
   ).
 
-%! calculate_models(
+%! calculate_models0(
 %!   +Model:iri,
 %!   +Context:ordset(pair(iri,integer)),
 %!   +CausalFormula:compound,
 %!   +Cause:ordset(iri),
 %!   -CausalPath:ordset(iri)
 %! ) is semidet.
-%! calculate_models(
+%! calculate_models0(
 %!   +Model:iri,
 %!   +Context:ordset(pair(iri,integer)),
 %!   +CausalFormula:compound,
@@ -102,7 +105,7 @@ calculate_models(M, Us, Phi_atom, Xs, Zs, Models):-
 %!   -CausalPath:ordset(iri)
 %! ) is nondet.
 
-calculate_models(M, Us, Phi, Xs, Zs):-
+calculate_models0(M, Us, Phi, Xs, Zs):-
   % Since we are now within an RDF transaction, we can assert the context.
   maplist(assign_value, Us),
 
@@ -125,7 +128,7 @@ calculate_models(M, Us, Phi, Xs, Zs):-
   % (condition 3: minimality).
   % Notice that smaller causes are considered first.
   \+ ((
-    models0(M, Us, Phi, Xs0, _, _),
+    models0(M, Us, Phi, Xs0, _),
     subset(Xs0, Xs)
   )),
 
