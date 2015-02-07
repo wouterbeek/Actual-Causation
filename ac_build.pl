@@ -108,6 +108,7 @@ assert_signature(M, in(Name,Range0)):-
   % aco:possible_value
   Range0 = Low..High,
   rdf_bnode(Range),
+  rdf_assert_instance(Range, aco:'Range', ac),
   rdf_assert(Var, aco:range, Range, ac),
   rdf_assert_typed_literal(Range, aco:low, Low, xsd:integer, ac),
   rdf_assert_typed_literal(Range, aco:high, High, xsd:integer, ac).

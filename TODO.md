@@ -10,9 +10,10 @@ Implementation
     [x] BUG: Causal graph does not render due to float// bug in plGraphViz.
   [ ] Architecture:
     [x] BUG: Check why simulations no longer work.
-    [o] BUG: Page reload is needed for causes and causal paths
-        to be populated in the Web UI.
-    [ ] Add RDFS schema for AC models.
+    [o] BUG: Multiple assertions of the same cause (in Billy&Suzy model).
+        This may be due to non-determinism in calculating condition 2B
+        in ac_models.pl.
+    [x] Add RDFS schema for AC models.
     [ ] Allow models to be entered via an HTML form.
     [ ] Store structural equations using IRIs and internal structure.
     [ ] Store causal formulas using IRIs and internal structure.

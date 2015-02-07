@@ -30,5 +30,13 @@ user:project('Actual-Causation', 'Modeling tool for Actual Causation.', ac).
    ]).
 
 :- use_module(library(semweb/rdf_db), except([rdf_node/1])).
+:- use_module(library(semweb/turtle)).
+
 :- rdf_register_prefix(ac, 'http://ac.org/resource/').
 :- rdf_register_prefix(aco, 'http://ac.org/ontology/').
+
+:- initialization(load_ac_schema).
+
+load_ac_schema:-
+  absolute_file_name(ac('schema/aco.ttl'), File, [access(read)]),
+  rdf_load(File, [format(turtle),graph(aco)]).

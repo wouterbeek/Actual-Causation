@@ -22,7 +22,7 @@
 :- initialization(debug_init).
 
 debug_init:-
-  maplist(load_test_model, [forest_fire,suze_and_billy]).
+  maplist(load_test_model, [forest_fire,suze_and_billy,careless_camper]).
 
 load_test_models:-
   forall(
@@ -75,7 +75,7 @@ load_test_model(suze_and_billy, M):-
     M
   ),
   assert_default_causal_formula(M, bs-1).
-load_test_model(careless_campler, M):-
+load_test_model(careless_camper, M):-
   assert_model(
     careless_camper,
     'Suppose that the Careless Camper (CC for short) has plans to go \c

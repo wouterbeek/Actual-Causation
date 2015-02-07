@@ -1,0 +1,235 @@
+digraph noname {
+  graph [charset="UTF-8";colorscheme="svg";fontsize=11.0;overlap="false";]
+
+  0 [color=darkolivegreen;label="assignment
+aco:AssignmentEntry
+\"'An assignment of a value to a random variable.'\"^^xsd:string";peripheries=1;shape=ellipse;]
+  1 [color=darkolivegreen;label="cause
+aco:CausalPath
+\"'A collection of path that start at outer endogenous variables (i.e., ones determined by exogenous variables)and that end in the variables that occur in a causal formula.'\"^^xsd:string";peripheries=1;shape=ellipse;]
+  2 [color=darkolivegreen;label="cause
+aco:Cause
+\"'A cause of a causal formula, relative to a causal model and context.'\"^^xsd:string";peripheries=1;shape=ellipse;]
+  3 [color=darkolivegreen;label="context
+aco:Context
+\"'A context.This is an assignment to the endogenous variables that are determined by exogenous variables alone.'\"^^xsd:string";peripheries=1;shape=ellipse;]
+  4 [color=darkolivegreen;label="'Endogenous variable'
+aco:EndogenousVariable
+\"'An endogenous variable.'\"^^xsd:string";peripheries=1;shape=ellipse;]
+  5 [color=darkolivegreen;label="'Exogenous variable'
+aco:ExogenousVariable
+\"'An exogenous variable.'\"^^xsd:string";peripheries=1;shape=ellipse;]
+  6 [color=darkolivegreen;label="'causal model'
+aco:Model
+\"'A causal model.'\"^^xsd:string";peripheries=1;shape=ellipse;]
+  7 [color=darkolivegreen;label="'causal explanation'
+aco:Models
+\"'A causal explanation for a given model and a given context.'\"^^xsd:string";peripheries=1;shape=ellipse;]
+  8 [color=darkolivegreen;label="aco:Range
+range
+\"'A value range.'\"^^xsd:string";peripheries=1;shape=ellipse;]
+  9 [color=darkolivegreen;label="'Random variable'
+aco:Variable
+\"'A random variable in a causal model.'\"^^xsd:string";peripheries=1;shape=ellipse;]
+  10 [color=darkolivegreen;label="'causal formula'
+aco:causal_formula
+\"'The causal formula that is entailed by a causal model and a context.'\"^^xsd:string";peripheries=1;shape=hexagon;]
+  11 [color=darkolivegreen;label="'causal path'
+aco:causal_path
+\"'The causal path that allows a given causal formula to be entailed by a given causal model and context.'\"^^xsd:string";peripheries=1;shape=hexagon;]
+  12 [color=darkolivegreen;label="causes
+aco:causes
+\"'Indicates that a variable occurs in a structural equation of another variable.'\"^^xsd:string";peripheries=1;shape=hexagon;]
+  13 [color=darkolivegreen;label="'has context'
+aco:context
+\"'The context under which a certain entailment holds.'\"^^xsd:string";peripheries=1;shape=hexagon;]
+  14 [color=darkolivegreen;label="'default causal formula'
+aco:default_causal_formula
+\"'The default causal formula that is entailed by a causal model and a context in the absence of a specified causal formula.'\"^^xsd:string";peripheries=1;shape=hexagon;]
+  15 [color=darkolivegreen;label="'has endogenous variable'
+aco:endogenous_variable
+\"'An endogenous variable of a causal model.'\"^^xsd:string";peripheries=1;shape=hexagon;]
+  16 [color=darkolivegreen;label="aco:entry_value
+value
+\"'The value of a random variable according to an assignment.'\"^^xsd:string";peripheries=1;shape=hexagon;]
+  17 [color=darkolivegreen;label="aco:entry_variable
+models
+\"'The variable to which a value is assigned.'\"^^xsd:string";peripheries=1;shape=hexagon;]
+  18 [color=darkolivegreen;label="'exogenous variable'
+aco:exogenous
+\"'The exogenous variable.'\"^^xsd:string";peripheries=1;shape=ellipse;]
+  19 [color=darkolivegreen;label="'has highest value'
+aco:high
+\"'The highest value of a value range.'\"^^xsd:string";peripheries=1;shape=hexagon;]
+  20 [color=darkolivegreen;label="'has lowest value'
+aco:low
+\"'The lowest value of a value range.'\"^^xsd:string";peripheries=1;shape=hexagon;]
+  21 [color=darkolivegreen;label="aco:models
+models
+\"'The fact that a certain causal path allows a given causal formula to be modeled on (1) a causal model and (2) a context.'\"^^xsd:string";peripheries=1;shape=hexagon;]
+  22 [color=darkolivegreen;label="'has range'
+aco:range
+\"'The range of a variable.'\"^^xsd:string";peripheries=1;shape=hexagon;]
+  23 [color=darkolivegreen;label="'has structural equation'
+aco:structural_equation
+\"'A structural equation that defines the value of a given variable in terms of the values of other variables.'\"^^xsd:string";peripheries=1;shape=hexagon;]
+  24 [color=darkolivegreen;label="'has value'
+aco:value
+\"'The value of a variable.'\"^^xsd:string";peripheries=1;shape=hexagon;]
+  25 [color=yellow;label="rdf:Property";peripheries=1;shape=ellipse;]
+  26 [color=mediumaquamarine;label="rdfs:Resource";peripheries=1;shape=ellipse;]
+  27 [color=plum;label="xsd:integer";peripheries=1;shape=ellipse;]
+  28 [color=plum;label="xsd:string";peripheries=1;shape=ellipse;]
+  29 [color=blue;label="\"'A causal explanation for a given model and a given context.'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  30 [color=blue;label="\"'A causal model.'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  31 [color=blue;label="\"'A cause of a causal formula, relative to a causal model and context.'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  32 [color=blue;label="\"'A collection of path that start at outer endogenous variables (i.e., ones determined by exogenous variables)and that end in the variables that occur in a causal formula.'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  33 [color=blue;label="\"'A context.This is an assignment to the endogenous variables that are determined by exogenous variables alone.'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  34 [color=blue;label="\"'A random variable in a causal model.'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  35 [color=blue;label="\"'A structural equation that defines the value of a given variable in terms of the values of other variables.'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  36 [color=blue;label="\"'A value range.'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  37 [color=blue;label="\"'An assignment of a value to a random variable.'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  38 [color=blue;label="\"'An endogenous variable of a causal model.'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  39 [color=blue;label="\"'An endogenous variable.'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  40 [color=blue;label="\"'An exogenous variable.'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  41 [color=blue;label="\"'Endogenous variable'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  42 [color=blue;label="\"'Exogenous variable'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  43 [color=blue;label="\"'Indicates that a variable occurs in a structural equation of another variable.'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  44 [color=blue;label="\"'Random variable'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  45 [color=blue;label="\"'The causal formula that is entailed by a causal model and a context.'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  46 [color=blue;label="\"'The causal path that allows a given causal formula to be entailed by a given causal model and context.'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  47 [color=blue;label="\"'The context under which a certain entailment holds.'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  48 [color=blue;label="\"'The default causal formula that is entailed by a causal model and a context in the absence of a specified causal formula.'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  49 [color=blue;label="\"'The exogenous variable.'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  50 [color=blue;label="\"'The fact that a certain causal path allows a given causal formula to be modeled on (1) a causal model and (2) a context.'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  51 [color=blue;label="\"'The highest value of a value range.'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  52 [color=blue;label="\"'The lowest value of a value range.'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  53 [color=blue;label="\"'The range of a variable.'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  54 [color=blue;label="\"'The value of a random variable according to an assignment.'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  55 [color=blue;label="\"'The value of a variable.'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  56 [color=blue;label="\"'The variable to which a value is assigned.'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  57 [color=blue;label="\"assignment\"^^xsd:string";peripheries=0;shape=plaintext;]
+  58 [color=blue;label="\"'causal explanation'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  59 [color=blue;label="\"'causal formula'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  60 [color=blue;label="\"'causal model'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  61 [color=blue;label="\"'causal path'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  62 [color=blue;label="\"cause\"^^xsd:string";peripheries=0;shape=plaintext;]
+  63 [color=blue;label="\"causes\"^^xsd:string";peripheries=0;shape=plaintext;]
+  64 [color=blue;label="\"context\"^^xsd:string";peripheries=0;shape=plaintext;]
+  65 [color=blue;label="\"'default causal formula'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  66 [color=blue;label="\"'exogenous variable'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  67 [color=blue;label="\"'has context'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  68 [color=blue;label="\"'has endogenous variable'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  69 [color=blue;label="\"'has highest value'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  70 [color=blue;label="\"'has lowest value'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  71 [color=blue;label="\"'has range'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  72 [color=blue;label="\"'has structural equation'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  73 [color=blue;label="\"'has value'\"^^xsd:string";peripheries=0;shape=plaintext;]
+  74 [color=blue;label="\"models\"^^xsd:string";peripheries=0;shape=plaintext;]
+  75 [color=blue;label="\"range\"^^xsd:string";peripheries=0;shape=plaintext;]
+  76 [color=blue;label="\"value\"^^xsd:string";peripheries=0;shape=plaintext;]
+
+  0 -> 37 [arrowhead=normal;label="rdfs:comment";style=solid;]
+  0 -> 57 [arrowhead=none;label="";style=dotted;]
+  0 -> 26 [arrowhead=box;label="";style=solid;]
+  1 -> 32 [arrowhead=normal;label="rdfs:comment";style=solid;]
+  1 -> 62 [arrowhead=none;label="";style=dotted;]
+  1 -> 26 [arrowhead=box;label="";style=solid;]
+  2 -> 31 [arrowhead=normal;label="rdfs:comment";style=solid;]
+  2 -> 62 [arrowhead=none;label="";style=dotted;]
+  2 -> 26 [arrowhead=box;label="";style=solid;]
+  3 -> 33 [arrowhead=normal;label="rdfs:comment";style=solid;]
+  3 -> 64 [arrowhead=none;label="";style=dotted;]
+  3 -> 26 [arrowhead=box;label="";style=solid;]
+  4 -> 39 [arrowhead=normal;label="rdfs:comment";style=solid;]
+  4 -> 41 [arrowhead=none;label="";style=dotted;]
+  4 -> 9 [arrowhead=box;label="";style=solid;]
+  5 -> 40 [arrowhead=normal;label="rdfs:comment";style=solid;]
+  5 -> 42 [arrowhead=none;label="";style=dotted;]
+  5 -> 9 [arrowhead=box;label="";style=solid;]
+  6 -> 30 [arrowhead=normal;label="rdfs:comment";style=solid;]
+  6 -> 60 [arrowhead=none;label="";style=dotted;]
+  6 -> 26 [arrowhead=box;label="";style=solid;]
+  7 -> 29 [arrowhead=normal;label="rdfs:comment";style=solid;]
+  7 -> 58 [arrowhead=none;label="";style=dotted;]
+  7 -> 26 [arrowhead=box;label="";style=solid;]
+  8 -> 36 [arrowhead=normal;label="rdfs:comment";style=solid;]
+  8 -> 75 [arrowhead=none;label="";style=dotted;]
+  8 -> 26 [arrowhead=box;label="";style=solid;]
+  9 -> 34 [arrowhead=normal;label="rdfs:comment";style=solid;]
+  9 -> 44 [arrowhead=none;label="";style=dotted;]
+  9 -> 26 [arrowhead=box;label="";style=solid;]
+  10 -> 25 [arrowhead=empty;label="";style=solid;]
+  10 -> 45 [arrowhead=normal;label="rdfs:comment";style=solid;]
+  10 -> 7 [arrowhead=normal;label="rdfs:domain";style=solid;]
+  10 -> 59 [arrowhead=none;label="";style=dotted;]
+  10 -> 28 [arrowhead=normal;label="rdfs:range";style=solid;]
+  11 -> 25 [arrowhead=empty;label="";style=solid;]
+  11 -> 46 [arrowhead=normal;label="rdfs:comment";style=solid;]
+  11 -> 7 [arrowhead=normal;label="rdfs:domain";style=solid;]
+  11 -> 61 [arrowhead=none;label="";style=dotted;]
+  11 -> 1 [arrowhead=normal;label="rdfs:range";style=solid;]
+  12 -> 25 [arrowhead=empty;label="";style=solid;]
+  12 -> 43 [arrowhead=normal;label="rdfs:comment";style=solid;]
+  12 -> 4 [arrowhead=normal;label="rdfs:domain";style=solid;]
+  12 -> 63 [arrowhead=none;label="";style=dotted;]
+  12 -> 4 [arrowhead=normal;label="rdfs:range";style=solid;]
+  13 -> 25 [arrowhead=empty;label="";style=solid;]
+  13 -> 47 [arrowhead=normal;label="rdfs:comment";style=solid;]
+  13 -> 7 [arrowhead=normal;label="rdfs:domain";style=solid;]
+  13 -> 67 [arrowhead=none;label="";style=dotted;]
+  13 -> 3 [arrowhead=normal;label="rdfs:range";style=solid;]
+  14 -> 25 [arrowhead=empty;label="";style=solid;]
+  14 -> 48 [arrowhead=normal;label="rdfs:comment";style=solid;]
+  14 -> 7 [arrowhead=normal;label="rdfs:domain";style=solid;]
+  14 -> 65 [arrowhead=none;label="";style=dotted;]
+  14 -> 28 [arrowhead=normal;label="rdfs:range";style=solid;]
+  15 -> 25 [arrowhead=empty;label="";style=solid;]
+  15 -> 38 [arrowhead=normal;label="rdfs:comment";style=solid;]
+  15 -> 6 [arrowhead=normal;label="rdfs:domain";style=solid;]
+  15 -> 68 [arrowhead=none;label="";style=dotted;]
+  15 -> 4 [arrowhead=normal;label="rdfs:range";style=solid;]
+  16 -> 25 [arrowhead=empty;label="";style=solid;]
+  16 -> 54 [arrowhead=normal;label="rdfs:comment";style=solid;]
+  16 -> 0 [arrowhead=normal;label="rdfs:domain";style=solid;]
+  16 -> 76 [arrowhead=none;label="";style=dotted;]
+  16 -> 27 [arrowhead=normal;label="rdfs:range";style=solid;]
+  17 -> 25 [arrowhead=empty;label="";style=solid;]
+  17 -> 56 [arrowhead=normal;label="rdfs:comment";style=solid;]
+  17 -> 0 [arrowhead=normal;label="rdfs:domain";style=solid;]
+  17 -> 74 [arrowhead=none;label="";style=dotted;]
+  17 -> 4 [arrowhead=normal;label="rdfs:range";style=solid;]
+  18 -> 9 [arrowhead=empty;label="";style=solid;]
+  18 -> 49 [arrowhead=normal;label="rdfs:comment";style=solid;]
+  18 -> 66 [arrowhead=none;label="";style=dotted;]
+  19 -> 25 [arrowhead=empty;label="";style=solid;]
+  19 -> 51 [arrowhead=normal;label="rdfs:comment";style=solid;]
+  19 -> 8 [arrowhead=normal;label="rdfs:domain";style=solid;]
+  19 -> 69 [arrowhead=none;label="";style=dotted;]
+  19 -> 27 [arrowhead=normal;label="rdfs:range";style=solid;]
+  20 -> 25 [arrowhead=empty;label="";style=solid;]
+  20 -> 52 [arrowhead=normal;label="rdfs:comment";style=solid;]
+  20 -> 8 [arrowhead=normal;label="rdfs:domain";style=solid;]
+  20 -> 70 [arrowhead=none;label="";style=dotted;]
+  20 -> 27 [arrowhead=normal;label="rdfs:range";style=solid;]
+  21 -> 25 [arrowhead=empty;label="";style=solid;]
+  21 -> 50 [arrowhead=normal;label="rdfs:comment";style=solid;]
+  21 -> 6 [arrowhead=normal;label="rdfs:domain";style=solid;]
+  21 -> 74 [arrowhead=none;label="";style=dotted;]
+  21 -> 7 [arrowhead=normal;label="rdfs:range";style=solid;]
+  22 -> 25 [arrowhead=empty;label="";style=solid;]
+  22 -> 53 [arrowhead=normal;label="rdfs:comment";style=solid;]
+  22 -> 9 [arrowhead=normal;label="rdfs:domain";style=solid;]
+  22 -> 71 [arrowhead=none;label="";style=dotted;]
+  22 -> 8 [arrowhead=normal;label="rdfs:range";style=solid;]
+  23 -> 25 [arrowhead=empty;label="";style=solid;]
+  23 -> 35 [arrowhead=normal;label="rdfs:comment";style=solid;]
+  23 -> 4 [arrowhead=normal;label="rdfs:domain";style=solid;]
+  23 -> 72 [arrowhead=none;label="";style=dotted;]
+  23 -> 28 [arrowhead=normal;label="rdfs:range";style=solid;]
+  24 -> 25 [arrowhead=empty;label="";style=solid;]
+  24 -> 55 [arrowhead=normal;label="rdfs:comment";style=solid;]
+  24 -> 9 [arrowhead=normal;label="rdfs:domain";style=solid;]
+  24 -> 73 [arrowhead=none;label="";style=dotted;]
+  24 -> 27 [arrowhead=normal;label="rdfs:range";style=solid;]
+}

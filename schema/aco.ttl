@@ -1,0 +1,159 @@
+@prefix  xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix  rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix  aco: <http://ac.org/ontology/> .
+
+# Named toplevel resources (25)
+
+aco:AssignmentEntry
+        rdfs:comment "An assignment of a value to a random variable."^^xsd:string ;
+        rdfs:label "assignment"^^xsd:string ;
+        rdfs:subClassOf rdfs:Resource .
+
+aco:CausalPath
+        rdfs:comment "A collection of path that start at outer endogenous variables (i.e., ones determined by exogenous variables)and that end in the variables that occur in a causal formula."^^xsd:string ;
+        rdfs:label "cause"^^xsd:string ;
+        rdfs:subClassOf rdfs:Resource .
+
+aco:Cause
+        rdfs:comment "A cause of a causal formula, relative to a causal model and context."^^xsd:string ;
+        rdfs:label "cause"^^xsd:string ;
+        rdfs:subClassOf rdfs:Resource .
+
+aco:Context
+        rdfs:comment "A context.This is an assignment to the endogenous variables that are determined by exogenous variables alone."^^xsd:string ;
+        rdfs:label "context"^^xsd:string ;
+        rdfs:subClassOf rdfs:Resource .
+
+aco:EndogenousVariable
+        rdfs:comment "An endogenous variable."^^xsd:string ;
+        rdfs:label "Endogenous variable"^^xsd:string ;
+        rdfs:subClassOf aco:Variable .
+
+aco:ExogenousVariable
+        rdfs:comment "An exogenous variable."^^xsd:string ;
+        rdfs:label "Exogenous variable"^^xsd:string ;
+        rdfs:subClassOf aco:Variable .
+
+aco:Model
+        rdfs:comment "A causal model."^^xsd:string ;
+        rdfs:label "causal model"^^xsd:string ;
+        rdfs:subClassOf rdfs:Resource .
+
+aco:Models
+        rdfs:comment "A causal explanation for a given model and a given context."^^xsd:string ;
+        rdfs:label "causal explanation"^^xsd:string ;
+        rdfs:subClassOf rdfs:Resource .
+
+aco:Range
+        rdfs:comment "A value range."^^xsd:string ;
+        rdfs:label "range"^^xsd:string ;
+        rdfs:subClassOf rdfs:Resource .
+
+aco:Variable
+        rdfs:comment "A random variable in a causal model."^^xsd:string ;
+        rdfs:label "Random variable"^^xsd:string ;
+        rdfs:subClassOf rdfs:Resource .
+
+aco:causal_formula
+        a rdf:Property ;
+        rdfs:comment "The causal formula that is entailed by a causal model and a context."^^xsd:string ;
+        rdfs:domain aco:Models ;
+        rdfs:label "causal formula"^^xsd:string ;
+        rdfs:range xsd:string .
+
+aco:causal_path
+        a rdf:Property ;
+        rdfs:comment "The causal path that allows a given causal formula to be entailed by a given causal model and context."^^xsd:string ;
+        rdfs:domain aco:Models ;
+        rdfs:label "causal path"^^xsd:string ;
+        rdfs:range aco:CausalPath .
+
+aco:causes
+        a rdf:Property ;
+        rdfs:comment "Indicates that a variable occurs in a structural equation of another variable."^^xsd:string ;
+        rdfs:domain aco:EndogenousVariable ;
+        rdfs:label "causes"^^xsd:string ;
+        rdfs:range aco:EndogenousVariable .
+
+aco:context
+        a rdf:Property ;
+        rdfs:comment "The context under which a certain entailment holds."^^xsd:string ;
+        rdfs:domain aco:Models ;
+        rdfs:label "has context"^^xsd:string ;
+        rdfs:range aco:Context .
+
+aco:default_causal_formula
+        a rdf:Property ;
+        rdfs:comment "The default causal formula that is entailed by a causal model and a context in the absence of a specified causal formula."^^xsd:string ;
+        rdfs:domain aco:Models ;
+        rdfs:label "default causal formula"^^xsd:string ;
+        rdfs:range xsd:string .
+
+aco:endogenous_variable
+        a rdf:Property ;
+        rdfs:comment "An endogenous variable of a causal model."^^xsd:string ;
+        rdfs:domain aco:Model ;
+        rdfs:label "has endogenous variable"^^xsd:string ;
+        rdfs:range aco:EndogenousVariable .
+
+aco:entry_value
+        a rdf:Property ;
+        rdfs:comment "The value of a random variable according to an assignment."^^xsd:string ;
+        rdfs:domain aco:AssignmentEntry ;
+        rdfs:label "value"^^xsd:string ;
+        rdfs:range xsd:integer .
+
+aco:entry_variable
+        a rdf:Property ;
+        rdfs:comment "The variable to which a value is assigned."^^xsd:string ;
+        rdfs:domain aco:AssignmentEntry ;
+        rdfs:label "models"^^xsd:string ;
+        rdfs:range aco:EndogenousVariable .
+
+aco:exogenous
+        a aco:Variable ;
+        rdfs:comment "The exogenous variable."^^xsd:string ;
+        rdfs:label "exogenous variable"^^xsd:string .
+
+aco:high
+        a rdf:Property ;
+        rdfs:comment "The highest value of a value range."^^xsd:string ;
+        rdfs:domain aco:Range ;
+        rdfs:label "has highest value"^^xsd:string ;
+        rdfs:range xsd:integer .
+
+aco:low
+        a rdf:Property ;
+        rdfs:comment "The lowest value of a value range."^^xsd:string ;
+        rdfs:domain aco:Range ;
+        rdfs:label "has lowest value"^^xsd:string ;
+        rdfs:range xsd:integer .
+
+aco:models
+        a rdf:Property ;
+        rdfs:comment "The fact that a certain causal path allows a given causal formula to be modeled on (1) a causal model and (2) a context."^^xsd:string ;
+        rdfs:domain aco:Model ;
+        rdfs:label "models"^^xsd:string ;
+        rdfs:range aco:Models .
+
+aco:range
+        a rdf:Property ;
+        rdfs:comment "The range of a variable."^^xsd:string ;
+        rdfs:domain aco:Variable ;
+        rdfs:label "has range"^^xsd:string ;
+        rdfs:range aco:Range .
+
+aco:structural_equation
+        a rdf:Property ;
+        rdfs:comment "A structural equation that defines the value of a given variable in terms of the values of other variables."^^xsd:string ;
+        rdfs:domain aco:EndogenousVariable ;
+        rdfs:label "has structural equation"^^xsd:string ;
+        rdfs:range xsd:string .
+
+aco:value
+        a rdf:Property ;
+        rdfs:comment "The value of a variable."^^xsd:string ;
+        rdfs:domain aco:Variable ;
+        rdfs:label "has value"^^xsd:string ;
+        rdfs:range xsd:integer .
