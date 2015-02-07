@@ -15,11 +15,15 @@ Causal models that can be used to test the Actual-Causation project.
 @version 2014/12, 2015/02
 */
 
-:- use_module(library(clpfd)).
+:- use_module(library(aggregate)).
+:- use_module(library(clpfd)). % Syntax?
+:- use_module(library(plunit)).
+:- use_module(library(semweb/rdfs)).
 
 :- use_module(ac(ac_build)).
 :- use_module(ac(ac_build_sim)).
 :- use_module(ac(ac_models)).
+:- use_module(ac(ac_read_sim)).
 
 
 
@@ -84,3 +88,27 @@ load_test_model(careless_camper, M):-
     M
   ),
   assert_default_causal_formula(M, f2-1).
+
+
+
+
+
+:- begin_tests(test_models).
+
+ac_models_test(forest_fire, [[lightning],[match]], true).
+
+test(ac_models, [forall(ac_models_test(Name,Causes,true))]):-
+  load_test_model(Name, M),
+  calculate_models(M, Us, _, Phi, Xs),
+  aggregate_all(
+    set(Cause),
+    (
+      models(M, Us, Phi, Xs, _, _),
+      maplist(rdfs_label, Xs, Labels),
+      sort(Labels, Cause)
+    ),
+    Causes0
+  ),
+  Causes = Causes0.
+
+:- end_tests(test_models).
