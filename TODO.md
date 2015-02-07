@@ -28,8 +28,8 @@ Implementation
     [ ] Document CLI + Web UI.
     [ ] Top-level (CLI) language translation into causal formalism.
     [ ] Document top-level language.
-    [ ] Quantify over contexts (potential/actual causer).
-    [ ] Unit testing: example models from literature.
+    [x] Quantify over contexts (potential/actual causer).
+    [o] Unit testing: example models from literature.
   [ ] Modeling:
     [ ] Golden standard: a collection of examples.
     [ ] Expressivity: Can we express common intuitions in terms of causation?

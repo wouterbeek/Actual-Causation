@@ -61,3 +61,6 @@
 [submodule "plTreeDraw"]
 	path = plTreeDraw
 	url = https://github.com/wouterbeek/plTreeDraw.git
+[submodule "plRdfDraw"]
+	path = plRdfDraw
+	url = https://github.com/wouterbeek/plRdfDraw.git
