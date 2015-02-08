@@ -1,8 +1,7 @@
 :- module(
   ac_models,
   [
-    calculate_models/5 % +Model:iri
-                       % ?Context:ordset(pair(iri,integer))
+    calculate_models/4 % +Model:iri
                        % ?CausalFormula1:atom
                        % ?CausalFormula2:atom
                        % ?Cause:ordset(pair(iri,integer))
@@ -47,17 +46,16 @@
 
 %! calculate_models(
 %!   +Model:iri,
-%!   ?Context:ordset(pair(iri,integer)),
 %!   ?CausalFormula1:atom,
 %!   ?CausalFormula2:atom,
 %!   ?Cause:ordset(iri)
 %! ) is det.
 
-calculate_models(M, Us, Phi_atom, Phi, Xs):-
+calculate_models(M, Phi_atom, Phi, Xs):-
   var(Phi_atom), !,
   once(rdf_simple_literal(M, aco:default_causal_formula, Phi_atom)),
-  calculate_models(M, Us, Phi_atom, Phi, Xs).
-calculate_models(M, Us, Phi_atom, Phi, Xs):-
+  calculate_models(M, Phi_atom, Phi, Xs).
+calculate_models(M, Phi_atom, Phi, Xs):-
   % @tbd Store causal formulas explicitly in RDF.
   read_term_from_atom(Phi_atom, Phi_term, []),
   % Replace the causal variable names with Prolog variables.
@@ -65,17 +63,16 @@ calculate_models(M, Us, Phi_atom, Phi, Xs):-
 
   setup_call_cleanup(
     % Reset cause memoization on a per-context basis.
-    retractall(models0(M, Us, Phi, _, _, _)),
+    retractall(models0(M, _, Phi, _, _, _)),
     % NONDET.
     % Generate contexts for the given causal model.
     forall(
       context(M, Us),
       (
-
         rdf_transaction(
           forall(
             % Set the context in the current database snapshot.
-            calculate_models0(M, Us, Phi, Xs, Zs),
+            calculate_models(M, Us, Phi, Xs, Zs),
             % Store this result to ensure minimality of future results.
             assertz(models0(M, Us, Phi, Xs, Zs))
           ),
@@ -90,14 +87,14 @@ calculate_models(M, Us, Phi_atom, Phi, Xs):-
     )
   ).
 
-%! calculate_models0(
+%! calculate_models(
 %!   +Model:iri,
 %!   +Context:ordset(pair(iri,integer)),
 %!   +CausalFormula:compound,
 %!   +Cause:ordset(iri),
 %!   -CausalPath:ordset(iri)
 %! ) is semidet.
-%! calculate_models0(
+%! calculate_models(
 %!   +Model:iri,
 %!   +Context:ordset(pair(iri,integer)),
 %!   +CausalFormula:compound,
@@ -105,7 +102,7 @@ calculate_models(M, Us, Phi_atom, Phi, Xs):-
 %!   -CausalPath:ordset(iri)
 %! ) is nondet.
 
-calculate_models0(M, Us, Phi, Xs, Zs):-
+calculate_models(M, Us, Phi, Xs, Zs):-
   % Since we are now within an RDF transaction, we can assert the context.
   maplist(assign_value, Us),
 

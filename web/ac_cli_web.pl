@@ -174,7 +174,7 @@ causes(M) -->
 models0(M, Us, Phi_atom, Phi, Xs, Zs, Models):-
   (   models(M, _, _, _, _, _)
   ->  true
-  ;   calculate_models(M, Us, Phi_atom, Phi, Xs)
+  ;   calculate_models(M, Phi_atom, Phi, Xs)
   ),
   % NONDET.
   models(M, Us, Phi, Xs, Zs, Models).

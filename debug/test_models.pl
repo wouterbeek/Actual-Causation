@@ -17,6 +17,7 @@ Causal models that can be used to test the Actual-Causation project.
 
 :- use_module(library(aggregate)).
 :- use_module(library(clpfd)). % Syntax?
+:- use_module(library(pairs)).
 :- use_module(library(plunit)).
 :- use_module(library(semweb/rdfs)).
 
@@ -34,13 +35,23 @@ Causal models that can be used to test the Actual-Causation project.
 load_test_model(Name):-
   load_test_model(Name, _).
 
-load_test_model(forest_fire, M):-
+load_test_model(forest_fire1, M):-
   assert_model(
-    forest_fire,
+    forest_fire1,
     'A forest fire can either be caused by lightning or an arsonist \c
      dropping a lit match.',
     [fire in 0..1, lightning in 0..1, match in 0..1],
     [fire #= max(lightning,match)],
+    M
+  ),
+  assert_default_causal_formula(M, fire-1).
+load_test_model(forest_fire2, M):-
+  assert_model(
+    forest_fire2,
+    'A forest fire can be caused by lightning and an arsonist \c
+     dropping a lit match (at the same time).',
+    [fire in 0..1, lightning in 0..1, match in 0..1],
+    [fire #= min(lightning,match)],
     M
   ),
   assert_default_causal_formula(M, fire-1).
@@ -97,21 +108,48 @@ load_test_model(careless_camper, M):-
 
 :- begin_tests(test_models).
 
-ac_models_test(forest_fire, [[lightning],[match]], true).
+ac_models_test(
+  forest_fire1,
+  [
+    [lightning-0,match-1]-[[match]],
+    [lightning-1,match-0]-[[lightning]],
+    [lightning-1,match-1]-[[lightning],[match]]
+  ],
+  true
+).
+ac_models_test(
+  forest_fire2,
+  [
+    [lightning-1,match-1]-[[lightning],[match]]
+  ],
+  true
+).
 
-test(ac_models, [forall(ac_models_test(Name,Causes,true))]):-
+test(ac_models, [forall(ac_models_test(Name,Pairs1,true))]):-
   load_test_model(Name, M),
-  calculate_models(M, Us, _, Phi, Xs),
+  calculate_models(M, _, Phi, Xs),
   aggregate_all(
-    set(Cause),
+    set(Context-Cause),
     (
       models(M, Us, Phi, Xs, _, _),
-      maplist(rdfs_label, Xs, Labels),
-      sort(Labels, Cause)
+      pp_context(Us, Context),
+      pp_cause(Xs, Cause)
     ),
-    Causes0
+    Pairs0
   ),
-  Causes = Causes0.
+  group_pairs_by_key(Pairs0, Pairs2),
+  Pairs2 == Pairs1.
+
+pp_assignment(Var1-Val, Var2-Val):-
+  once(rdfs_label(Var1, Var2)).
+
+pp_cause(L1, L3):-
+  maplist(rdfs_label, L1, L2),
+  sort(L2, L3).
+
+pp_context(L1, L3):-
+  maplist(pp_assignment, L1, L2),
+  sort(L2, L3).
 
 :- end_tests(test_models).
 

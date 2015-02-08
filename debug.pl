@@ -16,7 +16,7 @@
 
 :- use_module(ac(debug/test_models)).
 
-:- initialization(debug_init).
+%:- initialization(debug_init).
 
 debug_init:-
   maplist(load_test_model, [forest_fire,suze_and_billy,careless_camper]).
