@@ -64,3 +64,6 @@
 [submodule "plRdfDraw"]
 	path = plRdfDraw
 	url = https://github.com/wouterbeek/plRdfDraw.git
+[submodule "ModelTheory"]
+	path = ModelTheory
+	url = https://github.com/wouterbeek/ModelTheory.git

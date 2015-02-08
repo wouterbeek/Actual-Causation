@@ -6,6 +6,7 @@ user:project('Actual-Causation', 'Modeling tool for Actual Causation.', ac).
 
 :- use_module(load_project).
 :- load_project([
+     mt-'ModelTheory',
      plc-'Prolog-Library-Collection',
      plDcg,
      plGraph,
