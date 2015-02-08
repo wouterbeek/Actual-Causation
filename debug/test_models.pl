@@ -25,6 +25,8 @@ Causal models that can be used to test the Actual-Causation project.
 :- use_module(ac(ac_models)).
 :- use_module(ac(ac_read_sim)).
 
+:- initialization(run_unit_tests).
+
 
 
 
@@ -112,3 +114,6 @@ test(ac_models, [forall(ac_models_test(Name,Causes,true))]):-
   Causes = Causes0.
 
 :- end_tests(test_models).
+
+run_unit_tests:-
+  run_tests(test_models).
