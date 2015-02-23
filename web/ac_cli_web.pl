@@ -8,7 +8,7 @@ and its simulation results (causes and contexts).
 ---
 
 @author Wouter Beek
-@version 2014/12-2015/01
+@version 2014/12-2015/02
 */
 
 :- use_module(library(aggregate)).
@@ -34,8 +34,8 @@ and its simulation results (causes and contexts).
 :- use_module(plRdf(api/rdf_read)).
 :- use_module(plRdf(api/rdfs_read)).
 
-:- use_module(plTabular(rdf_html_table)).
-:- use_module(plTabular(rdf_term_html)).
+:- use_module(plRdfHtml(rdf_html_table)).
+:- use_module(plRdfHtml(rdf_term_html)).
 
 :- use_module(ac(ac_export)).
 :- use_module(ac(ac_models)).
