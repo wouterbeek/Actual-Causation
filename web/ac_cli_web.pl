@@ -23,11 +23,10 @@ and its simulation results (causes and contexts).
 :- use_module(plXml(xml_dom)).
 
 :- use_module(plHtml(html_collection)).
-:- use_module(plHtml(html_list)).
 :- use_module(plHtml(html_pl_term)).
-:- use_module(plHtml(html_table)).
-
-:- use_module(plServer(templates/menu_page)). % HTML template
+:- use_module(plHtml(elements/html_list)).
+:- use_module(plHtml(elements/html_table)).
+:- use_module(plHtml(templates/menu_page)). % HTML template
 
 :- use_module(plGraphDraw(svg_gv)).
 

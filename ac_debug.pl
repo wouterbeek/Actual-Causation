@@ -21,11 +21,11 @@
 :- use_module(library(lists), except([delete/3,subset/2])).
 :- use_module(library(semweb/rdf_db), except([rdf_node/1])).
 
-:- use_module(plDcg(dcg_atom)).
-:- use_module(plDcg(dcg_bracket)).
-:- use_module(plDcg(dcg_code)).
-:- use_module(plDcg(dcg_generics)).
-:- use_module(plDcg(dcg_unicode)).
+:- use_module(plc(dcg/dcg_atom)).
+:- use_module(plc(dcg/dcg_bracket)).
+:- use_module(plc(dcg/dcg_code)).
+:- use_module(plc(dcg/dcg_generics)).
+:- use_module(plc(dcg/dcg_unicode)).
 
 :- use_module(plRdf(api/rdfs_read)).
 

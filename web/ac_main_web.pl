@@ -9,7 +9,7 @@
 :- use_module(library(http/html_write)).
 :- use_module(library(http/http_dispatch)).
 
-:- use_module(plServer(templates/menu_page)).
+:- use_module(plHtml(templates/menu_page)).
 
 :- http_handler(/, ac_main_web, [prefix]).
 

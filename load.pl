@@ -6,32 +6,30 @@ user:project('Actual-Causation', 'Modeling tool for Actual Causation.', ac).
 
 :- use_module(load_project).
 :- load_project([
-     mt-'ModelTheory',
-     plc-'Prolog-Library-Collection',
-     plDcg,
-     plGraph,
-     plGraphDraw,
-     plGraphViz,
-     plHtml,
-     plHttp,
-     plLangTag,
-     plLattice,
-     plLatticeDraw,
-     plRdf,
-     plRdfDraw,
-     plRdfEntailment,
-     plRdfHtml,
-     plServer,
-     plSet,
-     plSvg,
-     plTabular,
-     plTms,
-     plTree,
-     plTreeDraw,
-     plUri,
-     plXml,
-     plXsd
-   ]).
+  mt-'ModelTheory',
+  plc-'Prolog-Library-Collection',
+  plGraph,
+  plGraphDraw,
+  plGraphViz,
+  plHtml,
+  plHttp,
+  plLangTag,
+  plLattice,
+  plLatticeDraw,
+  plRdf,
+  plRdfDraw,
+  plRdfEntailment,
+  plRdfHtml,
+  plSet,
+  plSvg,
+  plTabular,
+  plTms,
+  plTree,
+  plTreeDraw,
+  plUri,
+  plXml,
+  plXsd
+]).
 
 :- use_module(library(semweb/rdf_db), except([rdf_node/1])).
 :- use_module(library(semweb/turtle)).
