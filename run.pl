@@ -10,11 +10,8 @@
 
 
 % Start a server that runs the Web interface.
-:- use_module(load_project).
-:- load_subproject(dh, plServer).
-
-:- use_module(plServer(app_server)).
-:- use_module(plServer(web_modules)). % Web module registration.
+:- use_module(plc(server/app_server)).
+:- use_module(plHtml(web_modules)). % Web module registration.
 
 :- start_app_server_clas.
 

@@ -23,8 +23,8 @@
 :- use_module(library(pairs)).
 :- use_module(library(semweb/rdf_db), except([rdf_node/1])).
 
-:- use_module(generics(list_ext)).
-:- use_module(generics(pair_ext)).
+:- use_module(plc(generics/list_ext)).
+:- use_module(plc(generics/pair_ext)).
 
 :- use_module(plSet(set_theory)).
 
