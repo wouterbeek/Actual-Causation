@@ -19,6 +19,8 @@ user:project('Actual-Causation', 'Modeling tool for Actual Causation.', ac).
      plLatticeDraw,
      plRdf,
      plRdfDraw,
+     plRdfEntailment,
+     plRdfHtml,
      plServer,
      plSet,
      plSvg,

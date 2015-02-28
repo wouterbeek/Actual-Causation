@@ -61,3 +61,9 @@
 [submodule "ModelTheory"]
 	path = ModelTheory
 	url = https://github.com/wouterbeek/ModelTheory.git
+[submodule "plRdfEntailment"]
+	path = plRdfEntailment
+	url = https://github.com/wouterbeek/plRdfEntailment.git
+[submodule "plRdfHtml"]
+	path = plRdfHtml
+	url = https://github.com/wouterbeek/plRdfHtml.git
