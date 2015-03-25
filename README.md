@@ -57,3 +57,8 @@ If the doctor advises to undergo the treatment the patient does so. The doctor's
 However, if the doctor does not give a specific verdict (e.g., he does not know what to advise), the patient will listen to the advise of the quack. Even though the quack may give the same advise in these situations, the quack will only become a cause of the patient's decision when the doctor gives no advice. In the latter case, both the doctor and the quack are causing the patient to decide as she does.
 
 ![](https://cdn.rawgit.com/wouterbeek/Actual-Causation/master/img/trumping.svg "Trumping example")
+
+Literature
+----------
+
+  - http://www.uva.nl/over-de-uva/organisatie/medewerkers/content/m/o/j.m.mooij/j.m.mooij.html

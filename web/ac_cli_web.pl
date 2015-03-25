@@ -26,7 +26,7 @@ and its simulation results (causes and contexts).
 :- use_module(plHtml(elements/html_collection)).
 :- use_module(plHtml(elements/html_list)).
 :- use_module(plHtml(elements/html_table)).
-:- use_module(plHtml(templates/menu_page)). % HTML template
+:- use_module(plHtml(template/menu_page)). % HTML template
 
 :- use_module(plGraphDraw(svg_gv)).
 
